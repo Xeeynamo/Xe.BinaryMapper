@@ -82,6 +82,8 @@ namespace Xe.BinaryMapper
             else if (type == typeof(uint)) value = reader.ReadUInt32();
             else if (type == typeof(long)) value = reader.ReadInt64();
             else if (type == typeof(ulong)) value = reader.ReadUInt64();
+            else if (type == typeof(float)) value = reader.ReadSingle();
+            else if (type == typeof(double)) value = reader.ReadDouble();
             else if (type == typeof(TimeSpan)) value = new TimeSpan(reader.ReadInt64());
             else if (type == typeof(DateTime)) value = new DateTime(reader.ReadInt64());
             else if (type.IsEnum)

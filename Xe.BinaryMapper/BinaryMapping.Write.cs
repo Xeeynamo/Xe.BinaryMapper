@@ -106,6 +106,8 @@ namespace Xe.BinaryMapper
             else if (type == typeof(uint)) writer.Write((uint)value);
             else if (type == typeof(long)) writer.Write((long)value);
             else if (type == typeof(ulong)) writer.Write((ulong)value);
+            else if (type == typeof(float)) writer.Write((float)value);
+            else if (type == typeof(double)) writer.Write((double)value);
             else if (type == typeof(TimeSpan)) writer.Write(((TimeSpan)value).Ticks);
             else if (type == typeof(DateTime)) writer.Write(((DateTime)value).Ticks);
             else if (type.IsEnum)

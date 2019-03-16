@@ -75,6 +75,8 @@ The DataAttribute can be used only on a property that has public getter and sett
 * `uint` / `System.UInt32` 4 bytes long.
 * `long` / `System.Int64` 8 bytes long.
 * `ulong` / `System.UInt64` 8 bytes long.
+* `float` / `System.Single` 4 bytes long.
+* `double` / `System.Double` 8 bytes long.
 * `TimeSpan` 8 bytes long.
 * `DateTime` 8 bytes long. Ignores the Kind property.
 * `Enum` customizable size based on inherted type.
@@ -84,7 +86,6 @@ The DataAttribute can be used only on a property that has public getter and sett
 
 # Future plans
 
-* Add float/double de/serialization
 * Customize the de/serialization of specific types
 * Improve performance caching types
 * NuGet definition

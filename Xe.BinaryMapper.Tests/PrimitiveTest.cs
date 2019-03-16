@@ -90,6 +90,26 @@ namespace Xe.BinaryMapper.Tests
             AssertReadAndWrite(value);
         }
 
+        [Theory]
+        [InlineData(float.MinValue)]
+        [InlineData(float.MaxValue)]
+        [InlineData(0.25)]
+        [InlineData(50.5)]
+        public void ReadAndWriteFloat(float value)
+        {
+            AssertReadAndWrite(value);
+        }
+
+        [Theory]
+        [InlineData(double.MinValue)]
+        [InlineData(double.MaxValue)]
+        [InlineData(0.25)]
+        [InlineData(50.5)]
+        public void ReadAndWriteDouble(double value)
+        {
+            AssertReadAndWrite(value);
+        }
+
         [Fact]
         public void ReadAndWriteTimeSpan()
         {
