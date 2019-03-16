@@ -46,7 +46,6 @@ namespace Xe.BinaryMapper
                     mapping.Writer(args);
                 }
                 else if (WritePrimitive(writer, type, value)) { }
-                else if (type == typeof(byte[])) writer.Write((byte[])value, 0, property.DataInfo.Count);
                 else if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)))
                 {
                     var listType = type.GetGenericArguments().FirstOrDefault();

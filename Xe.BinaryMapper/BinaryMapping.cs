@@ -6,7 +6,7 @@ namespace Xe.BinaryMapper
 {
     public partial class BinaryMapping
     {
-        private class MappingWriteArgs
+        public class MappingWriteArgs
         {
             public BinaryWriter Writer { get; set; }
 
@@ -15,14 +15,14 @@ namespace Xe.BinaryMapper
             public DataAttribute DataAttribute { get; set; }
         }
 
-        private class MappingReadArgs
+        public class MappingReadArgs
         {
             public BinaryReader Reader { get; set; }
 
             public DataAttribute DataAttribute { get; set; }
         }
 
-        private class Mapping
+        public class Mapping
         {
             public Action<MappingWriteArgs> Writer { get; set; }
 
@@ -101,6 +101,15 @@ namespace Xe.BinaryMapper
                 Writer = x => Write(x.Writer, (string)x.Item, x.DataAttribute.Count),
                 Reader = x => ReadString(x.Reader, x.DataAttribute.Count)
             },
+            [typeof(byte[])] = new Mapping
+            {
+                Writer = x => x.Writer.Write((byte[])x.Item, 0, x.DataAttribute.Count),
+                Reader = x => x.Reader.ReadBytes(x.DataAttribute.Count)
+            },
         };
+
+        public static void SetMapping<T>(Mapping mapping) => SetMapping(typeof(T), mapping);
+
+        public static void SetMapping(Type type, Mapping mapping) => mappings[type] = mapping;
     }
 }

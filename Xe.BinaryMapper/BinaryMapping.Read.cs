@@ -42,7 +42,6 @@ namespace Xe.BinaryMapper
                     value = mapping.Reader(args);
                 }
                 else if (ReadPrimitive(reader, type, out var outValue)) value = outValue;
-                else if (type == typeof(byte[])) value = reader.ReadBytes(property.DataInfo.Count);
                 else if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)))
                 {
                     var listType = type.GetGenericArguments().FirstOrDefault();
