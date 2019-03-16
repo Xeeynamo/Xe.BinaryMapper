@@ -34,7 +34,11 @@ namespace Xe.BinaryMapper
                     writer.BaseStream.Position = baseOffset + offset.Value;
                 }
 
-                if (WritePrimitive(writer, type, value)) { }
+                if (mappings.TryGetValue(type, out var mapping))
+                {
+                    mapping.Writer(writer, value);
+                }
+                else if (WritePrimitive(writer, type, value)) { }
                 else if (type == typeof(string)) Write(writer, value as string, property.DataInfo.Count);
                 else if (type == typeof(byte[])) writer.Write((byte[])value, 0, property.DataInfo.Count);
                 else if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)))
@@ -97,19 +101,7 @@ namespace Xe.BinaryMapper
 
         private static bool WritePrimitive(BinaryWriter writer, Type type, object value)
         {
-            if (type == typeof(bool)) writer.Write((bool)value ? 1 : 0);
-            else if (type == typeof(byte)) writer.Write((byte)value);
-            else if (type == typeof(sbyte)) writer.Write((sbyte)value);
-            else if (type == typeof(short)) writer.Write((short)value);
-            else if (type == typeof(ushort)) writer.Write((ushort)value);
-            else if (type == typeof(int)) writer.Write((int)value);
-            else if (type == typeof(uint)) writer.Write((uint)value);
-            else if (type == typeof(long)) writer.Write((long)value);
-            else if (type == typeof(ulong)) writer.Write((ulong)value);
-            else if (type == typeof(float)) writer.Write((float)value);
-            else if (type == typeof(double)) writer.Write((double)value);
-            else if (type == typeof(TimeSpan)) writer.Write(((TimeSpan)value).Ticks);
-            else if (type == typeof(DateTime)) writer.Write(((DateTime)value).Ticks);
+            if (type == typeof(byte)) writer.Write((byte)value);
             else if (type.IsEnum)
             {
                 var underlyingType = Enum.GetUnderlyingType(type);

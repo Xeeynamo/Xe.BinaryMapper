@@ -31,7 +31,11 @@ namespace Xe.BinaryMapper
                     reader.BaseStream.Position = baseOffset + offset.Value;
                 }
 
-                if (ReadPrimitive(reader, type, out var outValue)) value = outValue;
+                if (mappings.TryGetValue(type, out var mapping))
+                {
+                    value = mapping.Reader(reader);
+                }
+                else if (ReadPrimitive(reader, type, out var outValue)) value = outValue;
                 else if (type == typeof(string)) value = ReadString(reader, property.DataInfo.Count);
                 else if (type == typeof(byte[])) value = reader.ReadBytes(property.DataInfo.Count);
                 else if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)))
@@ -73,19 +77,7 @@ namespace Xe.BinaryMapper
 
         private static bool ReadPrimitive(BinaryReader reader, Type type, out object value)
         {
-            if (type == typeof(bool)) value = reader.ReadByte() != 0;
-            else if (type == typeof(byte)) value = reader.ReadByte();
-            else if (type == typeof(sbyte)) value = reader.ReadSByte();
-            else if (type == typeof(short)) value = reader.ReadInt16();
-            else if (type == typeof(ushort)) value = reader.ReadUInt16();
-            else if (type == typeof(int)) value = reader.ReadInt32();
-            else if (type == typeof(uint)) value = reader.ReadUInt32();
-            else if (type == typeof(long)) value = reader.ReadInt64();
-            else if (type == typeof(ulong)) value = reader.ReadUInt64();
-            else if (type == typeof(float)) value = reader.ReadSingle();
-            else if (type == typeof(double)) value = reader.ReadDouble();
-            else if (type == typeof(TimeSpan)) value = new TimeSpan(reader.ReadInt64());
-            else if (type == typeof(DateTime)) value = new DateTime(reader.ReadInt64());
+            if (type == typeof(byte)) value = reader.ReadByte();
             else if (type.IsEnum)
             {
                 var underlyingType = Enum.GetUnderlyingType(type);
