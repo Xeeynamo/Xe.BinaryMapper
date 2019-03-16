@@ -20,6 +20,11 @@ namespace Xe.BinaryMapper
                 .Where(x => x.DataInfo != null)
                 .ToList();
 
+            var args = new MappingReadArgs
+            {
+                Reader = reader
+            };
+
             foreach (var property in properties)
             {
                 object value;
@@ -33,7 +38,8 @@ namespace Xe.BinaryMapper
 
                 if (mappings.TryGetValue(type, out var mapping))
                 {
-                    value = mapping.Reader(reader);
+                    args.DataAttribute = property.DataInfo;
+                    value = mapping.Reader(args);
                 }
                 else if (ReadPrimitive(reader, type, out var outValue)) value = outValue;
                 else if (type == typeof(string)) value = ReadString(reader, property.DataInfo.Count);

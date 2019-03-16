@@ -23,6 +23,11 @@ namespace Xe.BinaryMapper
                 .Where(x => x.DataInfo != null)
                 .ToList();
 
+            var args = new MappingWriteArgs()
+            {
+                Writer = writer
+            };
+
             foreach (var property in properties)
             {
                 object value = property.MemberInfo.GetValue(obj);
@@ -36,7 +41,9 @@ namespace Xe.BinaryMapper
 
                 if (mappings.TryGetValue(type, out var mapping))
                 {
-                    mapping.Writer(writer, value);
+                    args.Item = value;
+                    args.DataAttribute = property.DataInfo;
+                    mapping.Writer(args);
                 }
                 else if (WritePrimitive(writer, type, value)) { }
                 else if (type == typeof(string)) Write(writer, value as string, property.DataInfo.Count);

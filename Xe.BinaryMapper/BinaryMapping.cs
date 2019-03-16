@@ -6,79 +6,95 @@ namespace Xe.BinaryMapper
 {
     public partial class BinaryMapping
     {
+        private class MappingWriteArgs
+        {
+            public BinaryWriter Writer { get; set; }
+
+            public object Item { get; set; }
+
+            public DataAttribute DataAttribute { get; set; }
+        }
+
+        private class MappingReadArgs
+        {
+            public BinaryReader Reader { get; set; }
+
+            public DataAttribute DataAttribute { get; set; }
+        }
+
         private class Mapping
         {
-            public Action<BinaryWriter, object> Writer { get; set; }
+            public Action<MappingWriteArgs> Writer { get; set; }
 
-            public Func<BinaryReader, object> Reader { get; set; }
+            public Func<MappingReadArgs, object> Reader { get; set; }
         }
 
         private static Dictionary<Type, Mapping> mappings = new Dictionary<Type, Mapping>
         {
             [typeof(bool)] = new Mapping
             {
-                Writer = (w, o) => w.Write((bool)o ? 1 : 0),
-                Reader = x => x.ReadByte() != 0
+                Writer = x => x.Writer.Write((bool)x.Item ? 1 : 0),
+                Reader = x => x.Reader.ReadByte() != 0
             },
             [typeof(byte)] = new Mapping
             {
-                Writer = (w, o) => w.Write((byte)o),
-                Reader = x => x.ReadByte()
+                Writer = x => x.Writer.Write((byte)x.Item),
+                Reader = x => x.Reader.ReadByte()
             },
             [typeof(sbyte)] = new Mapping
             {
-                Writer = (w, o) => w.Write((sbyte)o),
-                Reader = x => x.ReadSByte()
+                Writer = x => x.Writer.Write((sbyte)x.Item),
+                Reader = x => x.Reader.ReadSByte()
             },
             [typeof(short)] = new Mapping
             {
-                Writer = (w, o) => w.Write((short)o),
-                Reader = x => x.ReadInt16()
+                Writer = x => x.Writer.Write((short)x.Item),
+                Reader = x => x.Reader.ReadInt16()
             },
             [typeof(ushort)] = new Mapping
             {
-                Writer = (w, o) => w.Write((ushort)o),
-                Reader = x => x.ReadUInt16()
+                Writer = x => x.Writer.Write((ushort)x.Item),
+                Reader = x => x.Reader.ReadUInt16()
             },
             [typeof(int)] = new Mapping
             {
-                Writer = (w, o) => w.Write((int)o),
-                Reader = x => x.ReadInt32()
+                Writer = x => x.Writer.Write((int)x.Item),
+                Reader = x => x.Reader.ReadInt32()
             },
             [typeof(uint)] = new Mapping
             {
-                Writer = (w, o) => w.Write((uint)o),
-                Reader = x => x.ReadUInt32()
+                Writer = x => x.Writer.Write((uint)x.Item),
+                Reader = x => x.Reader.ReadUInt32()
             },
             [typeof(long)] = new Mapping
             {
-                Writer = (w, o) => w.Write((long)o),
-                Reader = x => x.ReadInt64()
+                Writer = x => x.Writer.Write((long)x.Item),
+                Reader = x => x.Reader.ReadInt64()
             },
             [typeof(ulong)] = new Mapping
             {
-                Writer = (w, o) => w.Write((ulong)o),
-                Reader = x => x.ReadUInt64()
+                Writer = x => x.Writer.Write((ulong)x.Item),
+                Reader = x => x.Reader.ReadUInt64()
             },
             [typeof(float)] = new Mapping
             {
-                Writer = (w, o) => w.Write((float)o),
-                Reader = x => x.ReadSingle()
+                Writer = x => x.Writer.Write((float)x.Item),
+                Reader = x => x.Reader.ReadSingle()
             },
             [typeof(double)] = new Mapping
             {
-                Writer = (w, o) => w.Write((double)o),
-                Reader = x => x.ReadDouble()
+                Writer = x => x.Writer.Write((double)x.Item),
+                Reader = x => x.Reader.ReadDouble()
             },
             [typeof(TimeSpan)] = new Mapping
             {
-                Writer = (w, o) => w.Write(((TimeSpan)o).Ticks),
-                Reader = x => new TimeSpan(x.ReadInt64())
+                Writer = x => x.Writer.Write(((TimeSpan)x.Item).Ticks),
+                Reader = x => new TimeSpan(x.Reader.ReadInt64())
             },
             [typeof(DateTime)] = new Mapping
             {
-                Writer = (w, o) => w.Write(((DateTime)o).Ticks),
-                Reader = x => new DateTime(x.ReadInt64())
+                Writer = x => x.Writer.Write(((DateTime)x.Item).Ticks),
+                Reader = x => new DateTime(x.Reader.ReadInt64())
             },
         };
     }
