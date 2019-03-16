@@ -16,7 +16,7 @@ Xe.BinaryMapper is a .Net library that is capable to deserialize and serialize a
 var obj = new Sample
 {
     Foo = 123,
-    Bar = new { 22, 44 }
+    Bar = new List<byte>(){ 22, 44 }
 };
 BinaryMapping.WriteObject(writer, obj);
 ```
