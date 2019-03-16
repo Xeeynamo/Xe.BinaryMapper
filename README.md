@@ -101,8 +101,7 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 # Future plans
 
 * Improve performance caching types
-* NuGet definition
-* CI/CD for testing and publishing on NuGet
+* Array and IEnumerable support
 
 # Projects that uses BinaryMapper
 
