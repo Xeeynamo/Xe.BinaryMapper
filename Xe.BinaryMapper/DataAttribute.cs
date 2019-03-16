@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Xe.BinaryMapper
 {
+    [AttributeUsage(AttributeTargets.Property)]
     public class DataAttribute : Attribute
     {
         public int? Offset { get; set; }
