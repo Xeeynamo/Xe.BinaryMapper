@@ -120,7 +120,7 @@ namespace Xe.BinaryMapper
 
         public static void Write(BinaryWriter writer, string str, int length)
         {
-            var data = Encoding.UTF8.GetBytes(str);
+            var data = StringEncoding.GetBytes(str);
             if (data.Length <= length)
             {
                 writer.Write(data, 0, data.Length);

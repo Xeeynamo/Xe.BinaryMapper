@@ -101,7 +101,7 @@ namespace Xe.BinaryMapper
         {
             var data = reader.ReadBytes(length);
             var terminatorIndex = Array.FindIndex(data, x => x == 0);
-            return Encoding.UTF8.GetString(data, 0, terminatorIndex < 0 ? length : terminatorIndex);
+            return StringEncoding.GetString(data, 0, terminatorIndex < 0 ? length : terminatorIndex);
         }
     }
 }

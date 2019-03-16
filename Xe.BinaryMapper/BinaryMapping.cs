@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Xe.BinaryMapper
 {
@@ -107,6 +108,8 @@ namespace Xe.BinaryMapper
                 Reader = x => x.Reader.ReadBytes(x.DataAttribute.Count)
             },
         };
+
+        public static Encoding StringEncoding { get; set; } = Encoding.UTF8;
 
         public static void SetMapping<T>(Mapping mapping) => SetMapping(typeof(T), mapping);
 
