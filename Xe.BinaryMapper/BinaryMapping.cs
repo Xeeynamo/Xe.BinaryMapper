@@ -30,7 +30,17 @@ namespace Xe.BinaryMapper
             public Func<MappingReadArgs, object> Reader { get; set; }
         }
 
-        private static Dictionary<Type, Mapping> mappings = new Dictionary<Type, Mapping>
+        private static Dictionary<Type, Mapping> mappings = DefaultMapping();
+
+        public static Encoding StringEncoding { get; set; } = Encoding.UTF8;
+
+        public static void SetMapping<T>(Mapping mapping) => SetMapping(typeof(T), mapping);
+
+        public static void SetMapping(Type type, Mapping mapping) => mappings[type] = mapping;
+
+        public static void RemoveCustomMappings() => mappings = DefaultMapping();
+
+        private static Dictionary<Type, Mapping> DefaultMapping() => new Dictionary<Type, Mapping>
         {
             [typeof(bool)] = new Mapping
             {
@@ -108,11 +118,5 @@ namespace Xe.BinaryMapper
                 Reader = x => x.Reader.ReadBytes(x.DataAttribute.Count)
             },
         };
-
-        public static Encoding StringEncoding { get; set; } = Encoding.UTF8;
-
-        public static void SetMapping<T>(Mapping mapping) => SetMapping(typeof(T), mapping);
-
-        public static void SetMapping(Type type, Mapping mapping) => mappings[type] = mapping;
     }
 }

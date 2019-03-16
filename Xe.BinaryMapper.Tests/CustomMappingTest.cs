@@ -22,6 +22,7 @@ namespace Xe.BinaryMapper.Tests
             });
 
             AssertReadAndWrite(new TimeSpan(hours: 0, minutes: 0, seconds: 500), 4);
+            BinaryMapping.RemoveCustomMappings();
         }
     }
 }
