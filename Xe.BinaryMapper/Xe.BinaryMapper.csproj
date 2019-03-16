@@ -6,22 +6,16 @@
     <Authors>Luciano (Xeeynamo) Ciccariello</Authors>
     <Description>Map binary streams into C# objects for read and write</Description>
     <Copyright>Copyright 2019 Luciano Ciccariello</Copyright>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile></PackageLicenseFile>
     <PackageProjectUrl>https://github.com/Xeeynamo/Xe.BinaryMapper</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/43698859</PackageIconUrl>
     <RepositoryType></RepositoryType>
     <RepositoryUrl>https://github.com/Xeeynamo/Xe.BinaryMapper</RepositoryUrl>
     <PackageTags>map serialize raw binary data stream</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Version>1.1.0</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
 
 </Project>
