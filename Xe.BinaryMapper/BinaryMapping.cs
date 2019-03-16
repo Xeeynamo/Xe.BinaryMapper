@@ -44,7 +44,7 @@ namespace Xe.BinaryMapper
         {
             [typeof(bool)] = new Mapping
             {
-                Writer = x => x.Writer.Write((bool)x.Item ? 1 : 0),
+                Writer = x => x.Writer.Write((byte)((bool)x.Item ? 1 : 0)),
                 Reader = x => x.Reader.ReadByte() != 0
             },
             [typeof(byte)] = new Mapping

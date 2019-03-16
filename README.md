@@ -74,7 +74,7 @@ A `Mapping` object is defined by two actions: `Writer` and `Reader`. An example 
 ```csharp
 BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 {
-    Writer = x => x.Writer.Write((bool)x.Item ? 1 : 0),
+    Writer = x => x.Writer.Write((byte)((bool)x.Item ? 1 : 0)),
     Reader = x => x.Reader.ReadByte() != 0
 });
 ```
