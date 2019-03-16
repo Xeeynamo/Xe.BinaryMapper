@@ -96,6 +96,11 @@ namespace Xe.BinaryMapper
                 Writer = x => x.Writer.Write(((DateTime)x.Item).Ticks),
                 Reader = x => new DateTime(x.Reader.ReadInt64())
             },
+            [typeof(string)] = new Mapping
+            {
+                Writer = x => Write(x.Writer, (string)x.Item, x.DataAttribute.Count),
+                Reader = x => ReadString(x.Reader, x.DataAttribute.Count)
+            },
         };
     }
 }
