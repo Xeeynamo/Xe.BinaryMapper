@@ -91,6 +91,7 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 * `ulong` / `System.UInt64` 8 bytes long.
 * `float` / `System.Single` 4 bytes long.
 * `double` / `System.Double` 8 bytes long.
+* `Enum` variable length.
 * `TimeSpan` 8 bytes long.
 * `DateTime` 8 bytes long. Ignores the Kind property.
 * `Enum` customizable size based on inherted type.

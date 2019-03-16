@@ -2,17 +2,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Xe.BinaryMapper
 {
     public partial class BinaryMapping
     {
+        private class MyProperty
+        {
+            public PropertyInfo MemberInfo { get; set; }
+
+            public DataAttribute DataInfo { get; set; }
+        }
+
         public static object ReadObject(BinaryReader reader, object obj, int baseOffset = 0)
         {
             var properties = obj.GetType()
                 .GetProperties()
-                .Select(x => new
+                .Select(x => new MyProperty
                 {
                     MemberInfo = x,
                     DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute
@@ -27,74 +35,60 @@ namespace Xe.BinaryMapper
 
             foreach (var property in properties)
             {
-                object value;
-                var type = property.MemberInfo.PropertyType;
-                var offset = property.DataInfo.Offset;
-
-                if (offset.HasValue)
+                if (property.DataInfo.Offset.HasValue)
                 {
-                    reader.BaseStream.Position = baseOffset + offset.Value;
+                    reader.BaseStream.Position = baseOffset + property.DataInfo.Offset.Value;
                 }
 
-                if (mappings.TryGetValue(type, out var mapping))
-                {
-                    args.DataAttribute = property.DataInfo;
-                    value = mapping.Reader(args);
-                }
-                else if (ReadPrimitive(reader, type, out var outValue)) value = outValue;
-                else if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)))
-                {
-                    var listType = type.GetGenericArguments().FirstOrDefault();
-                    if (listType == null)
-                        throw new InvalidDataException($"The list {property.MemberInfo.Name} does not have any specified type.");
-
-                    var addMethod = type.GetMethod("Add");
-                    value = Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
-
-                    for (int i = 0; i < property.DataInfo.Count; i++)
-                    {
-                        var oldPosition = (int)reader.BaseStream.Position;
-                        if (ReadPrimitive(reader, listType, out var listValue))
-                        {
-                            addMethod.Invoke(value, new[] { listValue });
-                        }
-                        else
-                        {
-                            addMethod.Invoke(value, new[] { ReadObject(reader, Activator.CreateInstance(listType), oldPosition) });
-                        }
-
-                        var newPosition = reader.BaseStream.Position;
-                        reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
-                    }
-                }
-                else
-                {
-                    value = ReadObject(reader, Activator.CreateInstance(type), (int)reader.BaseStream.Position);
-                }
-
+                var value = ReadProperty(args, property.MemberInfo.PropertyType, property);
                 property.MemberInfo.SetValue(obj, value);
             }
 
             return obj;
         }
 
-
-        private static bool ReadPrimitive(BinaryReader reader, Type type, out object value)
+        private static object ReadProperty(MappingReadArgs args, Type type, MyProperty property)
         {
-            if (type == typeof(byte)) value = reader.ReadByte();
+            if (mappings.TryGetValue(type, out var mapping))
+            {
+                args.DataAttribute = property.DataInfo;
+                return mapping.Reader(args);
+            }
             else if (type.IsEnum)
             {
                 var underlyingType = Enum.GetUnderlyingType(type);
-                if (!ReadPrimitive(reader, underlyingType, out value))
+                if (!mappings.TryGetValue(underlyingType, out mapping))
                     throw new InvalidDataException($"The enum {type.Name} has an unsupported size.");
+
+                args.DataAttribute = property.DataInfo;
+                return mapping.Reader(args);
+            }
+            else if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)))
+            {
+                var listType = type.GetGenericArguments().FirstOrDefault();
+                if (listType == null)
+                    throw new InvalidDataException($"The list {property.MemberInfo.Name} does not have any specified type.");
+
+                var addMethod = type.GetMethod("Add");
+                var list = Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
+
+                for (int i = 0; i < property.DataInfo.Count; i++)
+                {
+                    var oldPosition = (int)args.Reader.BaseStream.Position;
+
+                    var item = ReadProperty(args, listType, property);
+                    addMethod.Invoke(list, new[] { item });
+
+                    var newPosition = args.Reader.BaseStream.Position;
+                    args.Reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
+                }
+
+                return list;
             }
             else
             {
-                value = null;
-                return false;
+                return ReadObject(args.Reader, Activator.CreateInstance(type), (int)args.Reader.BaseStream.Position);
             }
-
-            return true;
         }
 
         private static string ReadString(BinaryReader reader, int length)
