@@ -65,6 +65,20 @@ The DataAttribute can be used only on a property that has public getter and sett
 * `count` how many times the item should be de/serialized. This is only useful for `byte[]` or `List<T>` types.
 * `stride` how long is the actual data to de/serialize. This is very useful to skip some data when de/serializing `List<T>` data.
 
+## Custom mapping
+
+To customize how the de/serialization works for a specific type, a `Mapping` object must be passed to `BinaryMapping.SetMapping`.
+
+A `Mapping` object is defined by two actions: `Writer` and `Reader`. An example on how to customize a mapping can be found here:
+
+```csharp
+BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
+{
+    Writer = x => x.Writer.Write((bool)x.Item ? 1 : 0),
+    Reader = x => x.Reader.ReadByte() != 0
+});
+```
+
 # Types supported
 
 * `byte` / `System.Byte` 1 byte long.
@@ -86,7 +100,6 @@ The DataAttribute can be used only on a property that has public getter and sett
 
 # Future plans
 
-* Customize the de/serialization of specific types
 * Improve performance caching types
 * NuGet definition
 * CI/CD for testing and publishing on NuGet
