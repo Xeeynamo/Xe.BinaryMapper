@@ -98,20 +98,12 @@ namespace Xe.BinaryMapper.Tests
             AssertReadAndWrite(new TimeSpan(123456L));
         }
 
-        //[Fact]
-        //public void ReadAndWriteDateTime()
-        //{
-        //    ReadAndWrite(DateTime.MinValue);
-        //    ReadAndWrite(DateTime.MaxValue);
-        //    ReadAndWrite(DateTime.Now);
-        //}
-
-        //[Fact]
-        //public void ReadAndWriteDateTimeOffset()
-        //{
-        //    ReadAndWrite(DateTimeOffset.MinValue);
-        //    ReadAndWrite(DateTimeOffset.MaxValue);
-        //    ReadAndWrite(DateTimeOffset.Now);
-        //}
+        [Fact]
+        public void ReadAndWriteDateTime()
+        {
+            AssertReadAndWrite(DateTime.MinValue, 8);
+            AssertReadAndWrite(DateTime.MaxValue, 8);
+            AssertReadAndWrite(DateTime.Now, 8);
+        }
     }
 }

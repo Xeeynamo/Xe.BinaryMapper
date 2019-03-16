@@ -4,7 +4,7 @@ Xe.BinaryMapper is a .Net library that is capable to deserialize and serialize a
 
 # Example
 
- ```
+ ```csharp
  class Sample
  {
      [Data] public short Foo { get; set; }
@@ -76,6 +76,7 @@ The DataAttribute can be used only on a property that has public getter and sett
 * `long` / `System.Int64` 8 bytes long.
 * `ulong` / `System.UInt64` 8 bytes long.
 * `TimeSpan` 8 bytes long.
+* `DateTime` 8 bytes long. Ignores the Kind property.
 * `Enum` customizable size based on inherted type.
 * `string` fixed size based from `count` parameter.
 * `byte[]` fixed array of bytes based from `count` parameter.
