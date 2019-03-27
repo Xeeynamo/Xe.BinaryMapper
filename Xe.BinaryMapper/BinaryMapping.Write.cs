@@ -9,14 +9,17 @@ namespace Xe.BinaryMapper
 {
     public partial class BinaryMapping
     {
-        private static readonly byte[] dummy = new byte[1024];
-
         public static object WriteObject(BinaryWriter writer, object obj, int baseOffset = 0)
         {
-            return WriteObject(new MappingWriteArgs
+            var result = WriteObject(new MappingWriteArgs
             {
                 Writer = writer
             }, obj, baseOffset);
+
+            if (writer.BaseStream.Position > writer.BaseStream.Length)
+                writer.BaseStream.SetLength(writer.BaseStream.Position);
+
+            return result;
         }
 
         public static object WriteObject(MappingWriteArgs args, object obj, int baseOffset = 0)
@@ -107,12 +110,7 @@ namespace Xe.BinaryMapper
                 }
                 else if (missingBytes > 0)
                 {
-                    do
-                    {
-                        int toWrite = Math.Min(dummy.Length, missingBytes);
-                        writer.Write(dummy, 0, toWrite);
-                        missingBytes -= toWrite;
-                    } while (missingBytes > 0);
+                    writer.BaseStream.Position += missingBytes;
                 }
             }
         }
