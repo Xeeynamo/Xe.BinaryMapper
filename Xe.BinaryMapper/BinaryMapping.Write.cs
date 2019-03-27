@@ -22,7 +22,7 @@ namespace Xe.BinaryMapper
             return result;
         }
 
-        public static object WriteObject(MappingWriteArgs args, object obj, int baseOffset = 0)
+        private static object WriteObject(MappingWriteArgs args, object obj, int baseOffset = 0)
         {
             var properties = obj.GetType()
                 .GetProperties()
@@ -115,7 +115,7 @@ namespace Xe.BinaryMapper
             }
         }
 
-        public static void Write(BinaryWriter writer, string str, int length)
+        private static void Write(BinaryWriter writer, string str, int length)
         {
             var data = StringEncoding.GetBytes(str);
             if (data.Length <= length)
