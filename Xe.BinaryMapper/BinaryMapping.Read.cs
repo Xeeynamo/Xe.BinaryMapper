@@ -60,7 +60,10 @@ namespace Xe.BinaryMapper
                     args.BitData = args.Reader.ReadByte();
                 return (args.BitData & (1 << args.BitIndex++)) != 0;
             }
-            else if (mappings.TryGetValue(type, out var mapping))
+            else
+                args.BitIndex = 0;
+
+            if (mappings.TryGetValue(type, out var mapping))
             {
                 args.DataAttribute = property.DataInfo;
                 return mapping.Reader(args);
