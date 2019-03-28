@@ -14,6 +14,8 @@ namespace Xe.BinaryMapper
             public PropertyInfo MemberInfo { get; set; }
 
             public DataAttribute DataInfo { get; set; }
+
+            public DataBitFieldAttribute DataBitFieldInfo { get; set; }
         }
 
         public static object ReadObject(BinaryReader reader, object obj, int baseOffset = 0)
@@ -23,7 +25,8 @@ namespace Xe.BinaryMapper
                 .Select(x => new MyProperty
                 {
                     MemberInfo = x,
-                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute
+                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute,
+                    DataBitFieldInfo = Attribute.GetCustomAttribute(x, typeof(DataBitFieldAttribute)) as DataBitFieldAttribute
                 })
                 .Where(x => x.DataInfo != null)
                 .ToList();
@@ -49,7 +52,15 @@ namespace Xe.BinaryMapper
 
         private static object ReadProperty(MappingReadArgs args, Type type, MyProperty property)
         {
-            if (mappings.TryGetValue(type, out var mapping))
+            if (property.DataBitFieldInfo != null)
+            {
+                if (args.BitIndex >= 8)
+                    args.BitIndex = 0;
+                if (args.BitIndex == 0)
+                    args.BitData = args.Reader.ReadByte();
+                return (args.BitData & (1 << args.BitIndex++)) != 0;
+            }
+            else if (mappings.TryGetValue(type, out var mapping))
             {
                 args.DataAttribute = property.DataInfo;
                 return mapping.Reader(args);
