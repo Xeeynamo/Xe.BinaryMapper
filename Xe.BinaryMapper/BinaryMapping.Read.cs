@@ -47,6 +47,7 @@ namespace Xe.BinaryMapper
                 property.MemberInfo.SetValue(obj, value);
             }
 
+            args.BitIndex = 0;
             return obj;
         }
 
