@@ -37,6 +37,14 @@ namespace Xe.BinaryMapper.Tests
             [DataBitField(0)] public bool Bit01 { get; set; }
         }
 
+        private class IndexedBitfieldFixture
+        {
+            [DataBitField(1, 1)] public bool Bit11 { get; set; }
+            [DataBitField(2, 2)] public bool Bit22 { get; set; }
+            [DataBitField] public bool Bit23 { get; set; }
+            [DataBitField(2, 5)] public bool Bit25 { get; set; }
+        }
+
         [Fact]
         public void SimpleBitfieldTest()
         {
@@ -113,6 +121,29 @@ namespace Xe.BinaryMapper.Tests
             memStream.Position = 0;
             Assert.Equal(rawData[0], memStream.ReadByte());
             Assert.Equal(rawData[1], memStream.ReadByte());
+        }
+
+        [Fact]
+        public void IndexedBitfieldTest()
+        {
+            var rawData = new byte[] { 0, 2, 0x2c };
+            var memStream = new MemoryStream(rawData);
+            var actual = BinaryMapping.ReadObject(new BinaryReader(memStream), new IndexedBitfieldFixture()) as IndexedBitfieldFixture;
+
+            Assert.NotNull(actual);
+            Assert.True(actual.Bit11);
+            Assert.True(actual.Bit22);
+            Assert.True(actual.Bit23);
+            Assert.True(actual.Bit25);
+
+            memStream = new MemoryStream();
+            BinaryMapping.WriteObject(new BinaryWriter(memStream), actual);
+
+            Assert.Equal(3, memStream.Length);
+            memStream.Position = 0;
+            Assert.Equal(rawData[0], memStream.ReadByte());
+            Assert.Equal(rawData[1], memStream.ReadByte());
+            Assert.Equal(rawData[2], memStream.ReadByte());
         }
     }
 }

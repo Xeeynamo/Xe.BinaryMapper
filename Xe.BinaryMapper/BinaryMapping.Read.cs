@@ -63,6 +63,9 @@ namespace Xe.BinaryMapper
                     args.BitIndex = 0;
                 if (args.BitIndex == 0)
                     args.BitData = args.Reader.ReadByte();
+                if (property.DataBitFieldInfo.BitIndex.HasValue)
+                    args.BitIndex = property.DataBitFieldInfo.BitIndex.Value;
+
                 return (args.BitData & (1 << args.BitIndex++)) != 0;
             }
             else

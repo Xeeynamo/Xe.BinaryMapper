@@ -60,6 +60,8 @@ namespace Xe.BinaryMapper
             {
                 if (args.BitIndex >= 8)
                     FlushBitField(args);
+                if (property.DataBitFieldInfo.BitIndex.HasValue)
+                    args.BitIndex = property.DataBitFieldInfo.BitIndex.Value;
 
                 if (value is bool bit && bit)
                     args.BitData |= (byte)(1 << args.BitIndex);
