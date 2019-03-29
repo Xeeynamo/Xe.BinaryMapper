@@ -6,7 +6,8 @@ Xe.BinaryMapper is a .Net library that is capable to deserialize and serialize a
 
 The library is available on NuGet and a `Install-Package Xe.BinaryMapper` will make it available in your project in few seconds.
 
-[![NuGet](https://img.shields.io/nuget/v/Xe.BinaryMapper.svg?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/Xe.BinaryMapper/)
+[![NuGet](https://img.shields.io/nuget/v/Xe.BinaryMapper.svg?logo=nuget)](https://www.nuget.org/packages/Xe.BinaryMapper/)
+[![Build status](https://ci.appveyor.com/api/projects/status/k4070p773wlk8e1g/branch/master?svg=true)](https://ci.appveyor.com/project/xeeynamo/xe-binarymapper/branch/master)
 
 
 
