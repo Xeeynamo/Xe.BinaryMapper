@@ -14,6 +14,8 @@ namespace Xe.BinaryMapper
             public PropertyInfo MemberInfo { get; set; }
 
             public DataAttribute DataInfo { get; set; }
+
+            public DataBitFieldAttribute DataBitFieldInfo { get; set; }
         }
 
         public static object ReadObject(BinaryReader reader, object obj, int baseOffset = 0)
@@ -23,7 +25,8 @@ namespace Xe.BinaryMapper
                 .Select(x => new MyProperty
                 {
                     MemberInfo = x,
-                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute
+                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute,
+                    DataBitFieldInfo = Attribute.GetCustomAttribute(x, typeof(DataBitFieldAttribute)) as DataBitFieldAttribute
                 })
                 .Where(x => x.DataInfo != null)
                 .ToList();
@@ -37,18 +40,37 @@ namespace Xe.BinaryMapper
             {
                 if (property.DataInfo.Offset.HasValue)
                 {
-                    reader.BaseStream.Position = baseOffset + property.DataInfo.Offset.Value;
+                    var newPosition = baseOffset + property.DataInfo.Offset.Value;
+                    if (reader.BaseStream.Position != newPosition + 1)
+                        args.BitIndex = 0;
+
+                    reader.BaseStream.Position = newPosition;
                 }
 
                 var value = ReadProperty(args, property.MemberInfo.PropertyType, property);
                 property.MemberInfo.SetValue(obj, value);
             }
 
+            args.BitIndex = 0;
             return obj;
         }
 
         private static object ReadProperty(MappingReadArgs args, Type type, MyProperty property)
         {
+            if (property.DataBitFieldInfo != null)
+            {
+                if (args.BitIndex >= 8)
+                    args.BitIndex = 0;
+                if (args.BitIndex == 0)
+                    args.BitData = args.Reader.ReadByte();
+                if (property.DataBitFieldInfo.BitIndex.HasValue)
+                    args.BitIndex = property.DataBitFieldInfo.BitIndex.Value;
+
+                return (args.BitData & (1 << args.BitIndex++)) != 0;
+            }
+            else
+                args.BitIndex = 0;
+
             if (mappings.TryGetValue(type, out var mapping))
             {
                 args.DataAttribute = property.DataInfo;

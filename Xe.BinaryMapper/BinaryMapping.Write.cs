@@ -29,7 +29,8 @@ namespace Xe.BinaryMapper
                 .Select(x => new MyProperty
                 {
                     MemberInfo = x,
-                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute
+                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute,
+                    DataBitFieldInfo = Attribute.GetCustomAttribute(x, typeof(DataBitFieldAttribute)) as DataBitFieldAttribute
                 })
                 .Where(x => x.DataInfo != null)
                 .ToList();
@@ -38,18 +39,39 @@ namespace Xe.BinaryMapper
             {
                 if (property.DataInfo.Offset.HasValue)
                 {
-                    args.Writer.BaseStream.Position = baseOffset + property.DataInfo.Offset.Value;
+                    var newPosition = baseOffset + property.DataInfo.Offset.Value;
+                    if (args.Writer.BaseStream.Position != newPosition)
+                        FlushBitField(args);
+
+                    args.Writer.BaseStream.Position = newPosition;
                 }
 
-                object value = property.MemberInfo.GetValue(obj);
+                var value = property.MemberInfo.GetValue(obj);
                 WriteProperty(args, value, property.MemberInfo.PropertyType, property);
             }
 
+            FlushBitField(args);
             return obj;
         }
 
         private static void WriteProperty(MappingWriteArgs args, object value, Type type, MyProperty property)
         {
+            if (property.DataBitFieldInfo != null)
+            {
+                if (args.BitIndex >= 8)
+                    FlushBitField(args);
+                if (property.DataBitFieldInfo.BitIndex.HasValue)
+                    args.BitIndex = property.DataBitFieldInfo.BitIndex.Value;
+
+                if (value is bool bit && bit)
+                    args.BitData |= (byte)(1 << args.BitIndex);
+
+                args.BitIndex++;
+                return;
+            }
+            else
+                FlushBitField(args);
+
             if (mappings.TryGetValue(type, out var mapping))
             {
                 args.Item = value;
@@ -91,6 +113,15 @@ namespace Xe.BinaryMapper
             {
                 WriteObject(args.Writer, value, (int)args.Writer.BaseStream.Position);
             }
+        }
+
+        private static void FlushBitField(MappingWriteArgs args)
+        {
+            if (args.BitIndex <= 0) return;
+
+            args.Writer.Write(args.BitData);
+            args.BitIndex = 0;
+            args.BitData = 0;
         }
 
         private static void WriteObject(MappingWriteArgs args, object value, Type listType, MyProperty property)
