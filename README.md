@@ -1,10 +1,14 @@
+
+
 # About
 
-Xe.BinaryMapper is a .Net library that is capable to deserialize and serialize a binary file into a managed object. BinaryMapper aims to be easy to use and to hack.
+Xe.BinaryMapper is a .Net library that is capable to deserialize and serialize a binary file into a managed object. BinaryMapper aims to be easy to use and to hack, without using additional dependencies.
 
 The library is available on NuGet and a `Install-Package Xe.BinaryMapper` will make it available in your project in few seconds.
 
-Learn more on https://www.nuget.org/packages/Xe.BinaryMapper/ .
+[![NuGet](https://img.shields.io/nuget/v/Xe.BinaryMapper.svg?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/Xe.BinaryMapper/)
+
+
 
 # Example
 
