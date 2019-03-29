@@ -40,7 +40,11 @@ namespace Xe.BinaryMapper
             {
                 if (property.DataInfo.Offset.HasValue)
                 {
-                    reader.BaseStream.Position = baseOffset + property.DataInfo.Offset.Value;
+                    var newPosition = baseOffset + property.DataInfo.Offset.Value;
+                    if (reader.BaseStream.Position != newPosition + 1)
+                        args.BitIndex = 0;
+
+                    reader.BaseStream.Position = newPosition;
                 }
 
                 var value = ReadProperty(args, property.MemberInfo.PropertyType, property);

@@ -91,5 +91,28 @@ namespace Xe.BinaryMapper.Tests
             Assert.Equal(rawData[2], memStream.ReadByte());
             Assert.Equal(rawData[3], memStream.ReadByte());
         }
+
+        [Fact]
+        public void OffsetBitfieldTest()
+        {
+            var rawData = new byte[] { 2, 5 };
+            var memStream = new MemoryStream(rawData);
+            var actual = BinaryMapping.ReadObject(new BinaryReader(memStream), new OffsetBitfieldFixture()) as OffsetBitfieldFixture;
+
+            Assert.NotNull(actual);
+            Assert.True(actual.Bit10);
+            Assert.False(actual.Bit11);
+            Assert.True(actual.Bit12);
+            Assert.False(actual.Bit00);
+            Assert.True(actual.Bit01);
+
+            memStream = new MemoryStream();
+            BinaryMapping.WriteObject(new BinaryWriter(memStream), actual);
+
+            Assert.Equal(2, memStream.Length);
+            memStream.Position = 0;
+            Assert.Equal(rawData[0], memStream.ReadByte());
+            Assert.Equal(rawData[1], memStream.ReadByte());
+        }
     }
 }

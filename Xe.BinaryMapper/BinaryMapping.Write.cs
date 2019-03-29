@@ -39,7 +39,11 @@ namespace Xe.BinaryMapper
             {
                 if (property.DataInfo.Offset.HasValue)
                 {
-                    args.Writer.BaseStream.Position = baseOffset + property.DataInfo.Offset.Value;
+                    var newPosition = baseOffset + property.DataInfo.Offset.Value;
+                    if (args.Writer.BaseStream.Position != newPosition)
+                        FlushBitField(args);
+
+                    args.Writer.BaseStream.Position = newPosition;
                 }
 
                 var value = property.MemberInfo.GetValue(obj);
