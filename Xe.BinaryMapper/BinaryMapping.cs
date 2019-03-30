@@ -52,8 +52,29 @@ namespace Xe.BinaryMapper
         {
             [typeof(bool)] = new Mapping
             {
-                Writer = x => x.Writer.Write((byte)((bool)x.Item ? 1 : 0)),
-                Reader = x => x.Reader.ReadByte() != 0
+                Writer = x =>
+                {
+                    if (x.BitIndex >= 8)
+                        FlushBitField(x);
+                    if (x.DataAttribute.BitIndex >= 0)
+                        x.BitIndex = x.DataAttribute.BitIndex;
+
+                    if (x.Item is bool bit && bit)
+                        x.BitData |= (byte)(1 << x.BitIndex);
+
+                    x.BitIndex++;
+                },
+                Reader = x =>
+                {
+                    if (x.BitIndex >= 8)
+                        x.BitIndex = 0;
+                    if (x.BitIndex == 0)
+                        x.BitData = x.Reader.ReadByte();
+                    if (x.DataAttribute.BitIndex >= 0)
+                        x.BitIndex = x.DataAttribute.BitIndex;
+
+                    return (x.BitData & (1 << x.BitIndex++)) != 0;
+                }
             },
             [typeof(byte)] = new Mapping
             {

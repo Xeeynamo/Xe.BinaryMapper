@@ -30,7 +30,6 @@ namespace Xe.BinaryMapper
                 {
                     MemberInfo = x,
                     DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute,
-                    DataBitFieldInfo = Attribute.GetCustomAttribute(x, typeof(DataBitFieldAttribute)) as DataBitFieldAttribute
                 })
                 .Where(x => x.DataInfo != null)
                 .ToList();
@@ -56,20 +55,7 @@ namespace Xe.BinaryMapper
 
         private static void WriteProperty(MappingWriteArgs args, object value, Type type, MyProperty property)
         {
-            if (property.DataBitFieldInfo != null)
-            {
-                if (args.BitIndex >= 8)
-                    FlushBitField(args);
-                if (property.DataBitFieldInfo.BitIndex.HasValue)
-                    args.BitIndex = property.DataBitFieldInfo.BitIndex.Value;
-
-                if (value is bool bit && bit)
-                    args.BitData |= (byte)(1 << args.BitIndex);
-
-                args.BitIndex++;
-                return;
-            }
-            else
+            if (type != typeof(bool))
                 FlushBitField(args);
 
             if (mappings.TryGetValue(type, out var mapping))

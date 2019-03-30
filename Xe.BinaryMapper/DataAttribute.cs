@@ -11,17 +11,21 @@ namespace Xe.BinaryMapper
 
         public int Stride { get; set; }
 
+        public int BitIndex { get; set; }
+
         public DataAttribute()
         {
             Offset = null;
             Count = 1;
+            BitIndex = -1;
         }
 
-        public DataAttribute(int offset, int count = 1, int stride = 0)
+        public DataAttribute(int offset, int count = 1, int stride = 0, int bitIndex = -1)
         {
             Offset = offset;
             Count = count;
             Stride = stride;
+            BitIndex = bitIndex;
         }
     }
 }

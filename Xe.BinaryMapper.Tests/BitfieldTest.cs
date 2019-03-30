@@ -7,42 +7,42 @@ namespace Xe.BinaryMapper.Tests
     {
         private class SimpleBitfieldFixture
         {
-            [DataBitField] public bool Bit0 { get; set; }
-            [DataBitField] public bool Bit1 { get; set; }
-            [DataBitField] public bool Bit2 { get; set; }
-            [DataBitField] public bool Bit3 { get; set; }
-            [DataBitField] public bool Bit4 { get; set; }
-            [DataBitField] public bool Bit5 { get; set; }
-            [DataBitField] public bool Bit6 { get; set; }
-            [DataBitField] public bool Bit7 { get; set; }
-            [DataBitField] public bool Bit8 { get; set; }
-            [DataBitField] public bool Bit9 { get; set; }
+            [Data] public bool Bit0 { get; set; }
+            [Data] public bool Bit1 { get; set; }
+            [Data] public bool Bit2 { get; set; }
+            [Data] public bool Bit3 { get; set; }
+            [Data] public bool Bit4 { get; set; }
+            [Data] public bool Bit5 { get; set; }
+            [Data] public bool Bit6 { get; set; }
+            [Data] public bool Bit7 { get; set; }
+            [Data] public bool Bit8 { get; set; }
+            [Data] public bool Bit9 { get; set; }
         }
 
         private class DiscontinuedBitfieldFixture
         {
-            [DataBitField] public bool Bit10 { get; set; }
-            [DataBitField] public bool Bit11 { get; set; }
+            [Data] public bool Bit10 { get; set; }
+            [Data] public bool Bit11 { get; set; }
             [Data] public short RandomData { get; set; }
-            [DataBitField] public bool Bit20 { get; set; }
-            [DataBitField] public bool Bit21 { get; set; }
+            [Data] public bool Bit20 { get; set; }
+            [Data] public bool Bit21 { get; set; }
         }
 
         private class OffsetBitfieldFixture
         {
-            [DataBitField(1)] public bool Bit10 { get; set; }
-            [DataBitField(1)] public bool Bit11 { get; set; }
-            [DataBitField(1)] public bool Bit12 { get; set; }
-            [DataBitField(0)] public bool Bit00 { get; set; }
-            [DataBitField(0)] public bool Bit01 { get; set; }
+            [Data(1)] public bool Bit10 { get; set; }
+            [Data(1)] public bool Bit11 { get; set; }
+            [Data(1)] public bool Bit12 { get; set; }
+            [Data(0)] public bool Bit00 { get; set; }
+            [Data(0)] public bool Bit01 { get; set; }
         }
 
         private class IndexedBitfieldFixture
         {
-            [DataBitField(1, 1)] public bool Bit11 { get; set; }
-            [DataBitField(2, 2)] public bool Bit22 { get; set; }
-            [DataBitField] public bool Bit23 { get; set; }
-            [DataBitField(2, 5)] public bool Bit25 { get; set; }
+            [Data(1, BitIndex = 1)] public bool Bit11 { get; set; }
+            [Data(2, BitIndex = 2)] public bool Bit22 { get; set; }
+            [Data] public bool Bit23 { get; set; }
+            [Data(2, BitIndex = 5)] public bool Bit25 { get; set; }
         }
 
         [Fact]
