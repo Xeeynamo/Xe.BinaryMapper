@@ -16,6 +16,12 @@ namespace Xe.BinaryMapper
             public DataAttribute DataInfo { get; set; }
         }
 
+        public static T ReadObject<T>(Stream stream, int baseOffset = 0) where T : class =>
+            ReadObject<T>(new BinaryReader(stream), baseOffset);
+
+        public static T ReadObject<T>(BinaryReader reader, int baseOffset = 0) where T : class =>
+            (T)ReadObject(reader, Activator.CreateInstance<T>(), baseOffset);
+
         public static object ReadObject(BinaryReader reader, object obj, int baseOffset = 0)
         {
             var properties = obj.GetType()

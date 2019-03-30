@@ -3,12 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Xe.BinaryMapper
 {
     public partial class BinaryMapping
     {
+        public static T WriteObject<T>(Stream stream, T item, int baseOffset = 0) where T : class =>
+            WriteObject(new BinaryWriter(stream), item, baseOffset);
+
+        public static T WriteObject<T>(BinaryWriter reader, T item, int baseOffset = 0) where T : class =>
+            (T)WriteObject(reader, (object)item, baseOffset);
+
         public static object WriteObject(BinaryWriter writer, object obj, int baseOffset = 0)
         {
             var result = WriteObject(new MappingWriteArgs
