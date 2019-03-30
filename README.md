@@ -6,10 +6,14 @@ Xe.BinaryMapper is a .Net library that is capable to deserialize and serialize a
 
 The library is available on NuGet and a `Install-Package Xe.BinaryMapper` will make it available in your project in few seconds.
 
-[![NuGet](https://img.shields.io/nuget/v/Xe.BinaryMapper.svg?logo=nuget)](https://www.nuget.org/packages/Xe.BinaryMapper/)
-[![Build status](https://ci.appveyor.com/api/projects/status/k4070p773wlk8e1g/branch/master?svg=true)](https://ci.appveyor.com/project/xeeynamo/xe-binarymapper/branch/master)
+[![NuGet](https://img.shields.io/nuget/v/Xe.BinaryMapper.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Xe.BinaryMapper/)
+![Last commit](https://img.shields.io/github/last-commit/xeeynamo/xe.binarymapper.svg?style=flat-square)
 
+[![Build status](https://img.shields.io/appveyor/ci/xeeynamo/xe-binarymapper/master.svg?style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/xeeynamo/xe-binarymapper/branch/master)
+[![Test status](https://img.shields.io/appveyor/tests/xeeynamo/xe-binarymapper.svg?compact_message&style=flat-square&logo=appveyor)](https://ci.appveyor.com/project/xeeynamo/xe-binarymapper/branch/master/tests)
 
+![Downloads](https://img.shields.io/nuget/dt/xe.binarymapper.svg?style=flat-square)
+[![Issues](https://img.shields.io/github/issues/xeeynamo/xe.binarymapper.svg?style=flat-square)](https://github.com/xeeynamo/xe.binarymapper/issues)
 
 # Example
 
@@ -151,7 +155,7 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 
 # Projects that uses BinaryMapper
 
-Kingdom Hearts 3 Save Editor 
+Kingdom Hearts 3 Save Editor
 
 https://github.com/Xeeynamo/KH3SaveEditor
 
