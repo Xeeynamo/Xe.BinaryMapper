@@ -68,6 +68,41 @@ The DataAttribute can be used only on a property that has public getter and sett
 * `offset` where the data is physically located inside the file; the value is relative to the class definition. If not specified, the offset value is the same as the previous offset + its value size.
 * `count` how many times the item should be de/serialized. This is only useful for `byte[]` or `List<T>` types.
 * `stride` how long is the actual data to de/serialize. This is very useful to skip some data when de/serializing `List<T>` data.
+* `bitIndex` A custom bit index to de/serialize. -1 ignores it, while between 0 and 7 is a valid value.
+
+## The type `bool` and bit fields
+
+By default, boolean types are read bit by bit if they are aligned. Infact, 8 consecutive boolean properties are considered 1 byte long.
+
+```csharp
+[Data] public bool Bit0 { get; set; }
+[Data] public bool Bit1 { get; set; }
+[Data] public bool Bit2 { get; set; }
+[Data] public bool Bit3 { get; set; }
+[Data] public byte SomeRandomData { get; set; }
+```
+
+The code snippet above will read a total of 2 bytes and only the first 4 bits of the first byte will be considered.
+
+```csharp
+[Data] public bool Bit0 { get; set; }
+[Data] public bool Bit1 { get; set; }
+[Data] public byte SomeRandomData { get; set; }
+[Data] public bool Bit2 { get; set; }
+[Data] public bool Bit3 { get; set; }
+```
+
+The code snippet above will read a total of 3 bytes. The first two bits will be read, then a byte and then the first two bits of the next byte. This is why order is important for alignment.
+
+```csharp
+[Data(0)] public bool Bit0 { get; set; }
+[Data] public bool Bit1 { get; set; }
+[Data] public byte SomeRandomData { get; set; }
+[Data(0, BitIndex = 2)] public bool Bit2 { get; set; }
+[Data] public bool Bit3 { get; set; }
+```
+
+The code snippet above will read again only 2 bytes. After reading the 2nd byte, it will return to the position 0 and to the 3rd bit (0 based index), continuing the read from there.
 
 ## Custom mapping
 
@@ -85,6 +120,7 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 
 # Types supported
 
+* `bool` / `System.Boolean` 1 bit long.
 * `byte` / `System.Byte` 1 byte long.
 * `sbyte` / `System.SByte` 1 byte long.
 * `short` / `System.Int16` 2 bytes long.
