@@ -58,9 +58,11 @@ Absolutely! Many primitive values are supported and can be customized (like how 
 
 ## Serialization
 
-The entire serialization happens in `BinaryMapping.WriteObject`, which accepts a `BinaryWriter` to write into a stream and the object to serialize.
+The entire serialization happens in `BinaryMapping.WriteObject`, which accepts a `Stream` or `BinaryWriter` to write into a stream and the object to serialize.
 
-The serialization always starts from `BinaryWriter.BaseStream.Position`.
+When using `ReadObject<T>`, a new instance of `T` will be created automatically, only if that `T` class contains a parameterless constructor. `ReadObject`, accepta an existing instance instead too, overwriting all the existing properties that has a `DataAttribute`
+
+The serialization always starts from `BinaryWriter.BaseStream.Position` or you can specify a base offset where the deserialization starts.
 
 ## Deserialization
 
