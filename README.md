@@ -35,7 +35,7 @@ BinaryMapping.WriteObject(writer, obj);
 ```
 will be serialized into `7B 00 00 00 16 00 2C 00 00 00`.
 
-## How the data is de/serialized
+## How the data is de/serialized under the hood
 The binary data serialized few lines ago can be break down in the following flow logic:
 
 `[Data] public short Foo { get; set; }`
@@ -54,7 +54,7 @@ But the `count` is `3`, so we will just write other two bytes of zeroed data.
 
 Absolutely! Many primitive values are supported and can be customized (like how to de/serialize TimeSpan for example). Plus, nested class definitions can be used.
 
-# Usage
+# Usage and documentation
 
 ## Serialization
 
@@ -70,9 +70,7 @@ The deserialization always starts from `BinaryReader.BaseStream.Position`.
 
 ## The Data attribute
 
-The `DataAttribute` is really important because, without it, the mapping does not happen.
-
-The DataAttribute can be used only on a property that has public getter and setter, and has the following three optional parameters:
+The `DataAttribute` is really important. Every property with this attribute will be evaluated during the de/serialization. It can be used only on a property that has public getter and setter, and has the following three optional parameters:
 
 * `offset` where the data is physically located inside the file; the value is relative to the class definition. If not specified, the offset value is the same as the previous offset + its value size.
 * `count` how many times the item should be de/serialized. This is only useful for `byte[]` or `List<T>` types.
@@ -127,6 +125,11 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 });
 ```
 
+## "But I do not want / I cannot modify the existing classes"
+
+A Data Transfer Object helps a lot. Libraries like `Automapper` allows you to map to existing classes your custom class that contains the `DataAttribute` specification for the properties.
+
+
 # Types supported
 
 * `bool` / `System.Boolean` 1 bit long.
@@ -152,6 +155,9 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 
 * Improve performance caching types
 * Array and IEnumerable support
+* BinaryMapping object instances, without relying to a global instance
+* Custom object de/serialization
+* Support for existing classes without using DataAttribute
 
 # Projects that uses BinaryMapper
 
