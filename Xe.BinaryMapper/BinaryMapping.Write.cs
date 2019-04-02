@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Xe.BinaryMapper
 {
@@ -50,7 +51,7 @@ namespace Xe.BinaryMapper
                     args.Writer.BaseStream.Position = newPosition;
                 }
 
-                var value = property.MemberInfo.GetValue(obj);
+                var value = property.MemberInfo.GetValue(obj, BindingFlags.Default, null, null, null);
                 WriteProperty(args, value, property.MemberInfo.PropertyType, property);
             }
 

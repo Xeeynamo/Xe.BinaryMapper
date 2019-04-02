@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Xe.BinaryMapper
 {
@@ -51,7 +50,7 @@ namespace Xe.BinaryMapper
                 }
 
                 var value = ReadProperty(args, property.MemberInfo.PropertyType, property);
-                property.MemberInfo.SetValue(obj, value);
+                property.MemberInfo.SetValue(obj, value, BindingFlags.Default, null, null, null);
             }
 
             args.BitIndex = 0;
