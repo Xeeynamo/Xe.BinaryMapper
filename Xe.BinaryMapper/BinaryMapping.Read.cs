@@ -13,6 +13,8 @@ namespace Xe.BinaryMapper
             public PropertyInfo MemberInfo { get; set; }
 
             public DataAttribute DataInfo { get; set; }
+
+            public Func<object, int> GetLengthFunc { get; set; }
         }
 
         public static T ReadObject<T>(Stream stream, int baseOffset = 0) where T : class =>

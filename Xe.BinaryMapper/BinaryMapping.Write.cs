@@ -28,15 +28,30 @@ namespace Xe.BinaryMapper
             return result;
         }
 
+        private static MyProperty GetPropertySettings(Type classType, PropertyInfo propertyInfo)
+        {
+            var property = new MyProperty
+            {
+                MemberInfo = propertyInfo,
+                DataInfo = Attribute.GetCustomAttribute(propertyInfo, typeof(DataAttribute)) as DataAttribute
+            };
+
+            if (memberMappings.TryGetValue(classType, out var classMapping))
+            {
+                if (classMapping.TryGetValue(propertyInfo.Name, out var func))
+                {
+                    property.GetLengthFunc = func;
+                }
+            }
+
+            return property;
+        }
+
         private static object WriteObject(MappingWriteArgs args, object obj, int baseOffset = 0)
         {
             var properties = obj.GetType()
                 .GetProperties()
-                .Select(x => new MyProperty
-                {
-                    MemberInfo = x,
-                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute,
-                })
+                .Select(x => GetPropertySettings(obj.GetType(), x))
                 .Where(x => x.DataInfo != null)
                 .ToList();
 
@@ -52,6 +67,7 @@ namespace Xe.BinaryMapper
                 }
 
                 var value = property.MemberInfo.GetValue(obj, BindingFlags.Default, null, null, null);
+                args.Count = property.GetLengthFunc?.Invoke(obj) ?? property.DataInfo.Count;
                 WriteProperty(args, value, property.MemberInfo.PropertyType, property);
             }
 
