@@ -27,11 +27,7 @@ namespace Xe.BinaryMapper
         {
             var properties = obj.GetType()
                 .GetProperties()
-                .Select(x => new MyProperty
-                {
-                    MemberInfo = x,
-                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute,
-                })
+                .Select(x => GetPropertySettings(obj.GetType(), x))
                 .Where(x => x.DataInfo != null)
                 .ToList();
 
@@ -51,6 +47,7 @@ namespace Xe.BinaryMapper
                     reader.BaseStream.Position = newPosition;
                 }
 
+                args.Count = property.GetLengthFunc?.Invoke(obj) ?? property.DataInfo.Count;
                 var value = ReadProperty(args, property.MemberInfo.PropertyType, property);
                 property.MemberInfo.SetValue(obj, value, BindingFlags.Default, null, null, null);
             }

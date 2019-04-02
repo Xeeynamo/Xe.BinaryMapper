@@ -28,25 +28,6 @@ namespace Xe.BinaryMapper
             return result;
         }
 
-        private static MyProperty GetPropertySettings(Type classType, PropertyInfo propertyInfo)
-        {
-            var property = new MyProperty
-            {
-                MemberInfo = propertyInfo,
-                DataInfo = Attribute.GetCustomAttribute(propertyInfo, typeof(DataAttribute)) as DataAttribute
-            };
-
-            if (memberMappings.TryGetValue(classType, out var classMapping))
-            {
-                if (classMapping.TryGetValue(propertyInfo.Name, out var func))
-                {
-                    property.GetLengthFunc = func;
-                }
-            }
-
-            return property;
-        }
-
         private static object WriteObject(MappingWriteArgs args, object obj, int baseOffset = 0)
         {
             var properties = obj.GetType()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Xe.BinaryMapper
@@ -27,6 +28,8 @@ namespace Xe.BinaryMapper
             public BinaryReader Reader { get; set; }
 
             public DataAttribute DataAttribute { get; set; }
+
+            public int Count { get; set; }
 
             public byte BitData { get; set; }
 
@@ -63,6 +66,26 @@ namespace Xe.BinaryMapper
         }
 
         public static void RemoveCustomMappings() => mappings = DefaultMapping();
+
+
+        private static MyProperty GetPropertySettings(Type classType, PropertyInfo propertyInfo)
+        {
+            var property = new MyProperty
+            {
+                MemberInfo = propertyInfo,
+                DataInfo = Attribute.GetCustomAttribute(propertyInfo, typeof(DataAttribute)) as DataAttribute
+            };
+
+            if (memberMappings.TryGetValue(classType, out var classMapping))
+            {
+                if (classMapping.TryGetValue(propertyInfo.Name, out var func))
+                {
+                    property.GetLengthFunc = func;
+                }
+            }
+
+            return property;
+        }
 
         private static Dictionary<Type, Mapping> DefaultMapping() => new Dictionary<Type, Mapping>
         {
@@ -155,12 +178,12 @@ namespace Xe.BinaryMapper
             [typeof(string)] = new Mapping
             {
                 Writer = x => Write(x.Writer, (string)x.Item, x.Count),
-                Reader = x => ReadString(x.Reader, x.DataAttribute.Count)
+                Reader = x => ReadString(x.Reader, x.Count)
             },
             [typeof(byte[])] = new Mapping
             {
                 Writer = x => x.Writer.Write((byte[])x.Item, 0, x.Count),
-                Reader = x => x.Reader.ReadBytes(x.DataAttribute.Count)
+                Reader = x => x.Reader.ReadBytes(x.Count)
             },
         };
     }

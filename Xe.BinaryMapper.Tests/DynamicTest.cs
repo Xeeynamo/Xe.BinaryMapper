@@ -27,7 +27,13 @@ namespace Xe.BinaryMapper.Tests
 
             var memStream = new MemoryStream();
             BinaryMapping.SetMemberLengthMapping<DynamicStringFixture>(nameof(obj.Text), (o, m) => o.Length);
-            BinaryMapping.WriteObject(new BinaryWriter(memStream), obj);
+            BinaryMapping.WriteObject(memStream, obj);
+            Assert.Equal(length + 1, memStream.Position);
+
+            memStream.Position = 0;
+            var actual = BinaryMapping.ReadObject<DynamicStringFixture>(memStream);
+            Assert.Equal(length, actual.Length);
+            Assert.Equal(expected, actual.Text);
             Assert.Equal(length + 1, memStream.Position);
         }
     }
