@@ -113,7 +113,7 @@ The code snippet above will read a total of 3 bytes. The first two bits will be 
 
 The code snippet above will read again only 2 bytes. After reading the 2nd byte, it will return to the position 0 and to the 3rd bit (0 based index), continuing the read from there.
 
-## Custom mapping
+## Customize type mapping
 
 To customize how the de/serialization works for a specific type, a `Mapping` object must be passed to `BinaryMapping.SetMapping`.
 
@@ -126,6 +126,43 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
     Reader = x => x.Reader.ReadByte() != 0
 });
 ```
+
+## Dynamic length of a `List<T>`
+
+When you specify `[Data(Count = 5)]` on a `List<T>`, that property will be de/serialized with a fixed length of 5, no matter what. Often you do not want to be stuck on that, since you might want to be able to specify a dynamic amount of elements. This can be achieved with a method called `BinaryMapping.SetMemberLengthMapping<T>`.
+
+Let's take the following example:
+```csharp
+private class ListExample
+{
+    [Data] public int Count { get; set; }
+    [Data] public List<DynamicStringFixture> Items { get; set; }
+}
+```
+
+You should be able to insert any amount of `Items` as possible, but of course you should define before a property that will read/write the amount of elements in it. TO achieve that, you need to link `Items` with `Count`, using the following statement:
+
+```csharp
+BinaryMapping.SetMemberLengthMapping<ListExample>(nameof(ListExample.Items), (o, m) => o.Count);
+```
+
+The code above says that, for the class `ListExample`, you want that the amount of elements inside `ListExample.Items` has to be taken from `Count`. Notice that in `(o, m)`, the `o` is the object instance of `ListExample` that will be processed right before `Items`, while `m` is a string that will be equal to the property name `Items`, useful if some branch condition is needed based on the property name.
+
+The problem with the code above is that you need to need to update `Count` manually before to serialize the object back, since it is a value that lives by its own. The best way is to use an helper method contained in `BinaryMappingHelpers` to get and set automatically the size of a `List<T>`. For that, you will need to modify `ListExample` like this:
+
+```csharp
+private class ListExample
+{
+    [Data] public int Count
+    {
+        get => Items.TryGetCount();
+        set => Items = Items.CreateOrResize(value);
+    }
+    [Data] public List<DynamicStringFixture> Items { get; set; }
+}
+```
+
+In that way you will couple `Count` and `Items` together, automating the step to update `Count` manually and reducing the amount of errors on your code.
 
 ## "But I do not want / I cannot modify the existing classes"
 
