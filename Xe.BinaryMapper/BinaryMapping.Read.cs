@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 
 namespace Xe.BinaryMapper
@@ -84,7 +85,7 @@ namespace Xe.BinaryMapper
                 var addMethod = type.GetMethod("Add");
                 var list = Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
 
-                for (int i = 0; i < property.DataInfo.Count; i++)
+                for (int i = 0; i < args.Count; i++)
                 {
                     var oldPosition = (int)args.Reader.BaseStream.Position;
 

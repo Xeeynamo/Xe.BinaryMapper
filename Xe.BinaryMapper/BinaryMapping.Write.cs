@@ -83,7 +83,7 @@ namespace Xe.BinaryMapper
                 if (listType == null)
                     throw new InvalidDataException($"The list {property.MemberInfo.Name} does not have any specified type.");
 
-                var missing = property.DataInfo.Count;
+                var missing = args.Count;
                 foreach (var item in value as IEnumerable)
                 {
                     if (missing-- < 1)
