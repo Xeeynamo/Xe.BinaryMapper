@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 
 namespace Xe.BinaryMapper
@@ -13,6 +14,8 @@ namespace Xe.BinaryMapper
             public PropertyInfo MemberInfo { get; set; }
 
             public DataAttribute DataInfo { get; set; }
+
+            public Func<object, int> GetLengthFunc { get; set; }
         }
 
         public static T ReadObject<T>(Stream stream, int baseOffset = 0) where T : class =>
@@ -25,11 +28,7 @@ namespace Xe.BinaryMapper
         {
             var properties = obj.GetType()
                 .GetProperties()
-                .Select(x => new MyProperty
-                {
-                    MemberInfo = x,
-                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute,
-                })
+                .Select(x => GetPropertySettings(obj.GetType(), x))
                 .Where(x => x.DataInfo != null)
                 .ToList();
 
@@ -49,6 +48,7 @@ namespace Xe.BinaryMapper
                     reader.BaseStream.Position = newPosition;
                 }
 
+                args.Count = property.GetLengthFunc?.Invoke(obj) ?? property.DataInfo.Count;
                 var value = ReadProperty(args, property.MemberInfo.PropertyType, property);
                 property.MemberInfo.SetValue(obj, value, BindingFlags.Default, null, null, null);
             }
@@ -85,7 +85,7 @@ namespace Xe.BinaryMapper
                 var addMethod = type.GetMethod("Add");
                 var list = Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
 
-                for (int i = 0; i < property.DataInfo.Count; i++)
+                for (int i = 0; i < args.Count; i++)
                 {
                     var oldPosition = (int)args.Reader.BaseStream.Position;
 

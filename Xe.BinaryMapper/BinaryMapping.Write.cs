@@ -32,11 +32,7 @@ namespace Xe.BinaryMapper
         {
             var properties = obj.GetType()
                 .GetProperties()
-                .Select(x => new MyProperty
-                {
-                    MemberInfo = x,
-                    DataInfo = Attribute.GetCustomAttribute(x, typeof(DataAttribute)) as DataAttribute,
-                })
+                .Select(x => GetPropertySettings(obj.GetType(), x))
                 .Where(x => x.DataInfo != null)
                 .ToList();
 
@@ -52,6 +48,7 @@ namespace Xe.BinaryMapper
                 }
 
                 var value = property.MemberInfo.GetValue(obj, BindingFlags.Default, null, null, null);
+                args.Count = property.GetLengthFunc?.Invoke(obj) ?? property.DataInfo.Count;
                 WriteProperty(args, value, property.MemberInfo.PropertyType, property);
             }
 
@@ -86,7 +83,7 @@ namespace Xe.BinaryMapper
                 if (listType == null)
                     throw new InvalidDataException($"The list {property.MemberInfo.Name} does not have any specified type.");
 
-                var missing = property.DataInfo.Count;
+                var missing = args.Count;
                 foreach (var item in value as IEnumerable)
                 {
                     if (missing-- < 1)
