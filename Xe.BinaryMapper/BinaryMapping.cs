@@ -67,7 +67,6 @@ namespace Xe.BinaryMapper
 
         public static void RemoveCustomMappings() => mappings = DefaultMapping();
 
-
         private static MyProperty GetPropertySettings(Type classType, PropertyInfo propertyInfo)
         {
             var property = new MyProperty
