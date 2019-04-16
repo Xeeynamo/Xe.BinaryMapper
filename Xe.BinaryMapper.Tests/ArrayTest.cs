@@ -34,6 +34,8 @@ namespace Xe.BinaryMapper.Tests
             GenericArrayWithData<byte>(length);
 
         [Theory]
+        [InlineData(5, 0)]
+        [InlineData(5, 1)]
         [InlineData(5, 5)]
         [InlineData(5, 6)]
         public void ByteArrayWithDataAndCustomLength(int expectedLength, int length) =>

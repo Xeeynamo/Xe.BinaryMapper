@@ -181,7 +181,16 @@ namespace Xe.BinaryMapper
             },
             [typeof(byte[])] = new Mapping
             {
-                Writer = x => x.Writer.Write((byte[])x.Item, 0, x.Count),
+                Writer = x =>
+                {
+                    var data = (byte[])x.Item;
+                    var bytesToWrite = Math.Min(data.Length, x.Count);
+                    x.Writer.Write(data, 0, bytesToWrite);
+                    
+                    var remainingBytes = x.Count - bytesToWrite;
+                    if (remainingBytes > 0)
+                        x.Writer.Write(new byte[remainingBytes], 0, remainingBytes);
+                },
                 Reader = x => x.Reader.ReadBytes(x.Count)
             },
         };
