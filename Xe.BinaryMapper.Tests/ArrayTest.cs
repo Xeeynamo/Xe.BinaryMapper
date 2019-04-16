@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Xunit;
+using Xe.BinaryMapper;
 using static Xe.BinaryMapper.Tests.Helpers;
 
 namespace Xe.BinaryMapper.Tests
@@ -23,31 +24,37 @@ namespace Xe.BinaryMapper.Tests
         }
 
         [Fact]
-        public void ByteArrayWithoutData()
+        public void ByteArrayWithoutData() =>
+            GenericArrayWithoutData<byte>();
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(10)]
+        public void ByteArrayWithData(int length) =>
+            GenericArrayWithData<byte>(length);
+
+        [Theory]
+        [InlineData(5, 5)]
+        [InlineData(5, 6)]
+        public void ByteArrayWithDataAndCustomLength(int expectedLength, int length) =>
+            GenericArrayWithDataAndCustomLength<byte>(expectedLength, length);
+
+        private void GenericArrayWithoutData<T>()
         {
-            AssertReadAndWrite(new FixtureWithoutData<byte>()
+            AssertReadAndWrite(new FixtureWithoutData<T>()
             {
-                Value = new byte[1]
+                Value = new T[1]
             }, null, 0);
         }
 
-        [Theory]
-        //[InlineData(0)]
-        //[InlineData(1)]
-        [InlineData(10)]
-        public void ByteArrayWithData(int length)
+        private void GenericArrayWithData<T>(int length)
         {
-            GenericArrayWithDataAndCustomLength<byte, FixtureWithData<byte>>(1, length);
+            GenericArrayWithDataAndCustomLength<T, FixtureWithData<T>>(1, length);
         }
 
-        [Theory]
-        //[InlineData(5, 0)]
-        //[InlineData(5, 4)]
-        [InlineData(5, 5)]
-        [InlineData(5, 6)]
-        public void ByteArrayWithDataAndCustomLength(int expectedLength, int length)
+        private void GenericArrayWithDataAndCustomLength<T>(int expectedLength, int length)
         {
-            GenericArrayWithDataAndCustomLength<byte, FixtureWithDataAndCustomLength<byte>>(expectedLength, length);
+            GenericArrayWithDataAndCustomLength<T, FixtureWithDataAndCustomLength<T>>(expectedLength, length);
         }
 
         private static void GenericArrayWithDataAndCustomLength<T, TFixture>(int expectedLength, int length)
