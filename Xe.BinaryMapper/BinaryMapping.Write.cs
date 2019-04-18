@@ -77,7 +77,7 @@ namespace Xe.BinaryMapper
                 args.Item = value;
                 mapping.Writer(args);
             }
-            else if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)))
+            else if (type.CanEnumerate())
             {
                 var listType = type.GetGenericArguments().FirstOrDefault();
                 if (listType == null)
