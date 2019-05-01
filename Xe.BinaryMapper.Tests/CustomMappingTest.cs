@@ -6,12 +6,6 @@ namespace Xe.BinaryMapper.Tests
 {
     public class CustomMappingTest
     {
-        private class Fixture : IGeneric<TimeSpan>
-        {
-            [Data] public TimeSpan Value { get; set; }
-        }
-
-
         [Fact]
         public void ReadAndWriteTimeSpan()
         {
