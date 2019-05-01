@@ -41,6 +41,24 @@ namespace Xe.BinaryMapper.Tests
         public void ByteArrayWithDataAndCustomLength(int expectedLength, int length) =>
             GenericArrayWithDataAndCustomLength<byte>(expectedLength, length);
 
+        [Fact]
+        public void IntArrayWithoutData() =>
+            GenericArrayWithoutData<int>();
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(10)]
+        public void IntArrayWithData(int length) =>
+            GenericArrayWithData<int>(length);
+
+        [Theory]
+        [InlineData(5, 0)]
+        [InlineData(5, 1)]
+        [InlineData(5, 5)]
+        [InlineData(5, 6)]
+        public void IntArrayWithDataAndCustomLength(int expectedLength, int length) =>
+            GenericArrayWithDataAndCustomLength<int>(expectedLength, length);
+
         private void GenericArrayWithoutData<T>()
         {
             AssertReadAndWrite(new FixtureWithoutData<T>()

@@ -79,8 +79,19 @@ namespace Xe.BinaryMapper
             }
             else if (type.CanEnumerate())
             {
-                var listType = type.GetGenericArguments().FirstOrDefault();
-                if (listType == null)
+                Type itemType;
+                if (type.IsArray)
+                {
+                    itemType = type?
+                        .GetMethod("Get")?
+                        .ReturnType;
+                }
+                else
+                {
+                    itemType = type.GetGenericArguments().FirstOrDefault();
+                }
+
+                if (itemType == null)
                     throw new InvalidDataException($"The list {property.MemberInfo.Name} does not have any specified type.");
 
                 var missing = args.Count;
@@ -89,13 +100,13 @@ namespace Xe.BinaryMapper
                     if (missing-- < 1)
                         break;
 
-                    WriteObject(args, item, listType, property);
+                    WriteObject(args, item, itemType, property);
                 }
 
                 while (missing-- > 0)
                 {
-                    var item = Activator.CreateInstance(listType);
-                    WriteObject(args, item, listType, property);
+                    var item = Activator.CreateInstance(itemType);
+                    WriteObject(args, item, itemType, property);
                 }
             }
             else

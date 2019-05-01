@@ -80,6 +80,11 @@ namespace Xe.BinaryMapper.Tests
             var actualType = value
                 .GetType();
 
+            if (typeof(T).IsArray)
+            {
+                expectedLength *= Marshal.SizeOf(typeof(T).GetMethod("Get").ReturnType);
+            }
+
             var actual = (IGeneric<T>)Activator.CreateInstance(actualType);
 
             var memory = new MemoryStream();

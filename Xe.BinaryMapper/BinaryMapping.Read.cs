@@ -98,6 +98,26 @@ namespace Xe.BinaryMapper
 
                 return list;
             }
+            else if (type.IsArray)
+            {
+                var arrayType = type.GetMethod("Get")?.ReturnType;
+                if (arrayType == null)
+                    throw new InvalidDataException($"Unable to get the underlying type of {type.Name}.");
+
+                var array = (Array)Activator.CreateInstance(type, args.Count);
+                for (var i = 0; i < args.Count; i++)
+                {
+                    var oldPosition = (int)args.Reader.BaseStream.Position;
+
+                    var item = ReadProperty(args, arrayType, property);
+                    array.SetValue(item, i);
+
+                    var newPosition = args.Reader.BaseStream.Position;
+                    args.Reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
+                }
+
+                return array;
+            }
             else
             {
                 return ReadObject(args.Reader, Activator.CreateInstance(type), (int)args.Reader.BaseStream.Position);
