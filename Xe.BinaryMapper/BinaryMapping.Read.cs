@@ -24,11 +24,11 @@ namespace Xe.BinaryMapper
         public static T ReadObject<T>(BinaryReader reader, int baseOffset = 0) where T : class =>
             (T)ReadObject(reader, Activator.CreateInstance<T>(), baseOffset);
 
-        public static object ReadObject(BinaryReader reader, object obj, int baseOffset = 0)
+        public static object ReadObject(BinaryReader reader, object item, int baseOffset = 0)
         {
-            var properties = obj.GetType()
+            var properties = item.GetType()
                 .GetProperties()
-                .Select(x => GetPropertySettings(obj.GetType(), x))
+                .Select(x => GetPropertySettings(item.GetType(), x))
                 .Where(x => x.DataInfo != null)
                 .ToList();
 
@@ -48,13 +48,13 @@ namespace Xe.BinaryMapper
                     reader.BaseStream.Position = newPosition;
                 }
 
-                args.Count = property.GetLengthFunc?.Invoke(obj) ?? property.DataInfo.Count;
+                args.Count = property.GetLengthFunc?.Invoke(item) ?? property.DataInfo.Count;
                 var value = ReadProperty(args, property.MemberInfo.PropertyType, property);
-                property.MemberInfo.SetValue(obj, value, BindingFlags.Default, null, null, null);
+                property.MemberInfo.SetValue(item, value, BindingFlags.Default, null, null, null);
             }
 
             args.BitIndex = 0;
-            return obj;
+            return item;
         }
 
         private static object ReadProperty(MappingReadArgs args, Type type, MyProperty property)

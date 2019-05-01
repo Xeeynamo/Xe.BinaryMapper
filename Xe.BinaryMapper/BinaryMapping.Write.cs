@@ -12,15 +12,15 @@ namespace Xe.BinaryMapper
         public static T WriteObject<T>(Stream stream, T item, int baseOffset = 0) where T : class =>
             WriteObject(new BinaryWriter(stream), item, baseOffset);
 
-        public static T WriteObject<T>(BinaryWriter reader, T item, int baseOffset = 0) where T : class =>
-            (T)WriteObject(reader, (object)item, baseOffset);
+        public static T WriteObject<T>(BinaryWriter writer, T item, int baseOffset = 0) where T : class =>
+            (T)WriteObject(writer, (object)item, baseOffset);
 
-        public static object WriteObject(BinaryWriter writer, object obj, int baseOffset = 0)
+        public static object WriteObject(BinaryWriter writer, object item, int baseOffset = 0)
         {
             var result = WriteObject(new MappingWriteArgs
             {
                 Writer = writer
-            }, obj, baseOffset);
+            }, item, baseOffset);
 
             if (writer.BaseStream.Position > writer.BaseStream.Length)
                 writer.BaseStream.SetLength(writer.BaseStream.Position);
@@ -28,11 +28,11 @@ namespace Xe.BinaryMapper
             return result;
         }
 
-        private static object WriteObject(MappingWriteArgs args, object obj, int baseOffset = 0)
+        private static object WriteObject(MappingWriteArgs args, object item, int baseOffset = 0)
         {
-            var properties = obj.GetType()
+            var properties = item.GetType()
                 .GetProperties()
-                .Select(x => GetPropertySettings(obj.GetType(), x))
+                .Select(x => GetPropertySettings(item.GetType(), x))
                 .Where(x => x.DataInfo != null)
                 .ToList();
 
@@ -47,13 +47,13 @@ namespace Xe.BinaryMapper
                     args.Writer.BaseStream.Position = newPosition;
                 }
 
-                var value = property.MemberInfo.GetValue(obj, BindingFlags.Default, null, null, null);
-                args.Count = property.GetLengthFunc?.Invoke(obj) ?? property.DataInfo.Count;
+                var value = property.MemberInfo.GetValue(item, BindingFlags.Default, null, null, null);
+                args.Count = property.GetLengthFunc?.Invoke(item) ?? property.DataInfo.Count;
                 WriteProperty(args, value, property.MemberInfo.PropertyType, property);
             }
 
             FlushBitField(args);
-            return obj;
+            return item;
         }
 
         private static void WriteProperty(MappingWriteArgs args, object value, Type type, MyProperty property)
