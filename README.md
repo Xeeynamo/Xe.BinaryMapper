@@ -1,6 +1,11 @@
-# Summary
+# Xe.BinaryMapper
+
+De/serialize a stream into a class.
+
+## Summary
 
 * [Overview](#about)
+* [Hello world](#helloworld)
 * [Dependencies and installation](#requirements-and-installation)
 * [Usage and documentation](#usage-and-documentation)
 
@@ -17,7 +22,7 @@
 * [Showcase](#showcase)
 
 
-# Overview
+## Overview
 
 Xe.BinaryMapper is a .Net library that is capable to deserialize and serialize a binary file into a managed object. BinaryMapper aims to be easy to use and to hack, without using additional dependencies.
 
@@ -30,7 +35,23 @@ Xe.BinaryMapper is a .Net library that is capable to deserialize and serialize a
 ![Downloads](https://img.shields.io/nuget/dt/xe.binarymapper.svg?style=flat-square)
 [![Issues](https://img.shields.io/github/issues/xeeynamo/xe.binarymapper.svg?style=flat-square)](https://github.com/xeeynamo/xe.binarymapper/issues)
 
-# Requirements and installation
+## Hello world
+
+The most simple usage is the following:
+
+```csharp
+class HelloWorld
+{
+    [Data] public short SomeValue { get; set; }
+}
+[...]
+using (var stream = File.Create("sample.bin"))
+    Xe.BinaryMapper.BinaryMapping.WriteObject(stream, new HelloWorld { SomeValue = 123 });
+```
+
+This will create a 2-byte file with the content of `7b 00`, since `SomeValue` is a `short` type.
+
+## Requirements and installation
 
 Xe.BinaryMapper is compatible with any project compiled using .Net Framework 3.5, .Net Framework 4.x or .Net Standard 2.0. The library is standalone and does not require with any other dependencies than the framework itself.
 
@@ -38,9 +59,9 @@ The library is available on NuGet. A `Install-Package Xe.BinaryMapper` will make
 
 There are no known limitations on using the library using the Mono runtime (eg. Unity3d).
 
-# Usage and documentation
+## Usage and documentation
 
-## Serialization
+### Serialization
 
 The entire serialization happens in `BinaryMapping.WriteObject`, which accepts the following parameters:
 
@@ -52,7 +73,7 @@ The entire serialization happens in `BinaryMapping.WriteObject`, which accepts t
 
 The returned value is the same item passed as parameter.
 
-## Deserialization
+### Deserialization
 
 The entire de-serialization happens in `BinaryMapping.ReadObject`, which accepts the following parameters:
 
@@ -62,7 +83,7 @@ The entire de-serialization happens in `BinaryMapping.ReadObject`, which accepts
 
 * `int baseOffset`: The absolute position in the stream where the read will start. (optional)
 
-## Properties and `Data` attribute
+### Properties and `Data` attribute
 
 The `DataAttribute` is really important. Every property with this attribute will be evaluated during the de/serialization. It can be used only on a property that has public getter and setter. The following three parameters can be specified:
 
@@ -71,7 +92,7 @@ The `DataAttribute` is really important. Every property with this attribute will
 * `stride` how long is the actual data to de/serialize. This is very useful to skip some data when de/serializing `List<T>` data.
 * `bitIndex` A custom bit index to de/serialize. -1 ignores it, while between 0 and 7 is a valid value.
 
-# Type `bool` and bit fields
+## Type `bool` and bit fields
 
 By default, boolean types are read bit by bit if they are aligned. Infact, 8 consecutive boolean properties are considered 1 byte long.
 
@@ -105,7 +126,7 @@ The code snippet above will read a total of 3 bytes. The first two bits will be 
 
 The code snippet above will read again only 2 bytes. After reading the 2nd byte, it will return to the position 0 and to the 3rd bit (0 based index), continuing the read from there.
 
-## Customize type mapping
+### Customize type mapping
 
 To customize how the de/serialization works for a specific type, a `Mapping` object must be passed to `BinaryMapping.SetMapping`.
 
@@ -119,7 +140,7 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 });
 ```
 
-## Dynamic length of type `List<>`
+### Dynamic length of type `List<>`
 
 When you specify `[Data(Count = 5)]` on a `List<T>`, that property will be de/serialized with a fixed length of 5, no matter what. Often you do not want to be stuck on that, since you might want to be able to specify a dynamic amount of elements. This can be achieved with a method called `BinaryMapping.SetMemberLengthMapping<T>`.
 
@@ -157,7 +178,7 @@ private class ListExample
 In that way you will couple `Count` and `Items` together, automating the step to update `Count` manually and reducing the amount of errors on your code.
 
 
-# Example
+## Example
 
  ```csharp
  class Sample
@@ -177,7 +198,7 @@ BinaryMapping.WriteObject(writer, obj);
 ```
 will be serialized into `7B 00 00 00 16 00 2C 00 00 00`.
 
-## How the data is de/serialized under the hood
+### How the data is de/serialized under the hood
 The binary data serialized few lines ago can be break down in the following flow logic:
 
 `[Data] public short Foo { get; set; }`
@@ -192,11 +213,11 @@ We now have a `List<>` of two `System.Byte`. The `stride` between each value is 
 
 But the `count` is `3`, so we will just write other two bytes of zeroed data.
 
-## Can be done more?
+### Can be done more?
 
 Absolutely! Many primitive values are supported and can be customized (like how to de/serialize TimeSpan for example). Plus, nested class definitions can be used.
 
-# Types supported
+## Types supported
 
 * `bool` / `System.Boolean` 1 bit long.
 * `byte` / `System.Byte` 1 byte long.
@@ -217,7 +238,7 @@ Absolutely! Many primitive values are supported and can be customized (like how 
 * `T[]` fixed array of any type, based from `count` parameter.
 * `List<>` dynamic list of any type.
 
-# Future plans
+## Future plans
 
 * Improve performance caching types
 * BinaryMapping object instances, without relying to a global instance
@@ -225,17 +246,17 @@ Absolutely! Many primitive values are supported and can be customized (like how 
 * Support for existing classes without using DataAttribute
 * Big-endian support
 
-# Showcase
+## Showcase
 
-## Kingdom Hearts 3 Save Editor
+### Kingdom Hearts Save Editor
 
 https://github.com/Xeeynamo/KH3SaveEditor
 
 Written by the author of BinaryMapper. This is a perfect example on a real scenario of how BinaryMapper can be used.
 
 
-## OpenKH
+### OpenKH
 
-https://github.com/Xeeynamo/OpenKH
+https://github.com/Xeeynamo/OpenKh
 
 Another example on how binary files from a videogame can be mapped into C# objects
