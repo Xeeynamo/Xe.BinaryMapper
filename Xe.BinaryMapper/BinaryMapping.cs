@@ -56,13 +56,15 @@ namespace Xe.BinaryMapper
             where T : class
         {
             var classType = typeof(T);
-            if (!memberMappings.TryGetValue(classType, out var classMapping))
+            UseMappings(mappings =>
             {
-                classMapping = new Dictionary<string, Func<object, int>>();
-                memberMappings.Add(classType, classMapping);
-            }
-
-            classMapping[memberName] = o => getLengthFunc((T)o, memberName);
+                if (!mappings.TryGetValue(classType, out var classMapping))
+                {
+                    classMapping = new Dictionary<string, Func<object, int>>();
+                    mappings.Add(classType, classMapping);
+                    classMapping[memberName] = o => getLengthFunc((T)o, memberName);
+                }
+            });
         }
 
         public static void RemoveCustomMappings() => mappings = DefaultMapping();
@@ -75,15 +77,24 @@ namespace Xe.BinaryMapper
                 DataInfo = Attribute.GetCustomAttribute(propertyInfo, typeof(DataAttribute)) as DataAttribute
             };
 
-            if (memberMappings.TryGetValue(classType, out var classMapping))
+            UseMappings(mappings =>
             {
-                if (classMapping.TryGetValue(propertyInfo.Name, out var func))
+                if (mappings.TryGetValue(classType, out var classMapping))
                 {
-                    property.GetLengthFunc = func;
+                    if (classMapping.TryGetValue(propertyInfo.Name, out var func))
+                    {
+                        property.GetLengthFunc = func;
+                    }
                 }
-            }
+            });
 
             return property;
+        }
+
+        private static void UseMappings(Action<Dictionary<Type, Dictionary<string, Func<object, int>>>> action)
+        {
+            lock (memberMappings)
+                action(memberMappings);
         }
 
         private static Dictionary<Type, Mapping> DefaultMapping() => new Dictionary<Type, Mapping>
