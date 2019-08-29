@@ -18,10 +18,12 @@ namespace Xe.BinaryMapper
             public Func<object, int> GetLengthFunc { get; set; }
         }
 
-        public static T ReadObject<T>(Stream stream, int baseOffset = 0) where T : class =>
+        public static T ReadObject<T>(Stream stream, int baseOffset = 0)
+            where T : class, new() =>
             ReadObject<T>(new BinaryReader(stream), baseOffset);
 
-        public static T ReadObject<T>(BinaryReader reader, int baseOffset = 0) where T : class =>
+        public static T ReadObject<T>(BinaryReader reader, int baseOffset = 0)
+            where T : class, new() =>
             (T)ReadObject(reader, Activator.CreateInstance<T>(), baseOffset);
 
         public static object ReadObject(BinaryReader reader, object item, int baseOffset = 0)

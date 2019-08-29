@@ -9,12 +9,13 @@ namespace Xe.BinaryMapper
         public static int TryGetCount<TItem>(this List<TItem> list) => list?.Count ?? 0;
 
         public static List<TItem> CreateOrResize<TItem>(this List<TItem> list, int count)
+            where TItem : new()
         {
             list = list ?? new List<TItem>();
             var difference = list.Count - count;
             if (difference < 0)
             {
-                list.AddRange(Enumerable.Range(0, -difference).Select(x => Activator.CreateInstance<TItem>()));
+                list.AddRange(Enumerable.Range(0, -difference).Select(x => new TItem()));
             }
             else if (difference > 0)
             {

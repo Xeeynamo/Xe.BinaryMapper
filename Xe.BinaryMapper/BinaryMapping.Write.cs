@@ -9,10 +9,12 @@ namespace Xe.BinaryMapper
 {
     public partial class BinaryMapping
     {
-        public static T WriteObject<T>(Stream stream, T item, int baseOffset = 0) where T : class =>
+        public static T WriteObject<T>(Stream stream, T item, int baseOffset = 0)
+            where T : class =>
             WriteObject(new BinaryWriter(stream), item, baseOffset);
 
-        public static T WriteObject<T>(BinaryWriter writer, T item, int baseOffset = 0) where T : class =>
+        public static T WriteObject<T>(BinaryWriter writer, T item, int baseOffset = 0)
+            where T : class =>
             (T)WriteObject(writer, (object)item, baseOffset);
 
         public static object WriteObject(BinaryWriter writer, object item, int baseOffset = 0)
