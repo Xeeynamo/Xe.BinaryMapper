@@ -102,11 +102,11 @@ namespace Xe.BinaryMapper
             }
             else if (type.IsArray)
             {
-                var arrayType = type.GetMethod("Get")?.ReturnType;
+                var arrayType = type.GetElementType();
                 if (arrayType == null)
                     throw new InvalidDataException($"Unable to get the underlying type of {type.Name}.");
 
-                var array = (Array)Activator.CreateInstance(type, args.Count);
+                var array = Array.CreateInstance(arrayType, args.Count);
                 for (var i = 0; i < args.Count; i++)
                 {
                     var oldPosition = (int)args.Reader.BaseStream.Position;
