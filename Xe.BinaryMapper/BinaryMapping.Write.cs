@@ -84,9 +84,10 @@ namespace Xe.BinaryMapper
                 Type itemType;
                 if (type.IsArray)
                 {
-                    itemType = type?
-                        .GetMethod("Get")?
-                        .ReturnType;
+                    if (value is Array array && array.Rank > 1)
+                        throw new NotImplementedException("Arrays with a rank greater than one are not currently supported.");
+
+                    itemType = type.GetElementType();
                 }
                 else
                 {

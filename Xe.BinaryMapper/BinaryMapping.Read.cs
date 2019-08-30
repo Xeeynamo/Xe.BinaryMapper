@@ -102,6 +102,9 @@ namespace Xe.BinaryMapper
             }
             else if (type.IsArray)
             {
+                if (type.GetArrayRank() > 1)
+                    throw new NotImplementedException("Arrays with a rank greater than one are not currently supported.");
+
                 var arrayType = type.GetElementType();
                 if (arrayType == null)
                     throw new InvalidDataException($"Unable to get the underlying type of {type.Name}.");
