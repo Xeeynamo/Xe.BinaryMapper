@@ -83,7 +83,7 @@ namespace Xe.BinaryMapper.Tests
 
             if (typeof(T).IsArray)
             {
-                expectedLength *= Marshal.SizeOf(typeof(T).GetMethod("Get").ReturnType);
+                expectedLength *= Marshal.SizeOf(typeof(T).GetElementType());
             }
 
             var actual = (IGeneric<T>)Activator.CreateInstance(actualType);
