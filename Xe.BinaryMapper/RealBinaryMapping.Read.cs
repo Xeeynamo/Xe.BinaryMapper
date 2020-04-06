@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
+using System.Text;
 
 namespace Xe.BinaryMapper
 {
-    public partial class BinaryMapping
+    internal partial class RealBinaryMapping
     {
         private class MyProperty
         {
@@ -18,15 +18,15 @@ namespace Xe.BinaryMapper
             public Func<object, int> GetLengthFunc { get; set; }
         }
 
-        public static T ReadObject<T>(Stream stream, int baseOffset = 0)
-            where T : class, new() =>
-            ReadObject<T>(new BinaryReader(stream), baseOffset);
+        public T ReadObject<T>(Stream stream, int baseOffset)
+            where T : class =>
+            (T)ReadObject(stream, Activator.CreateInstance<T>(), baseOffset);
 
-        public static T ReadObject<T>(BinaryReader reader, int baseOffset = 0)
-            where T : class, new() =>
-            (T)ReadObject(reader, Activator.CreateInstance<T>(), baseOffset);
+        public T ReadObject<T>(Stream stream, T item, int baseOffset)
+            where T : class =>
+            (T)ReadRawObject(new BinaryReader(stream), item, baseOffset);
 
-        public static object ReadObject(BinaryReader reader, object item, int baseOffset = 0)
+        private object ReadRawObject(BinaryReader reader, object item, int baseOffset)
         {
             var properties = item.GetType()
                 .GetProperties()
@@ -59,7 +59,7 @@ namespace Xe.BinaryMapper
             return item;
         }
 
-        private static object ReadProperty(MappingReadArgs args, Type type, MyProperty property)
+        private object ReadProperty(MappingReadArgs args, Type type, MyProperty property)
         {
             if (type != typeof(bool))
                 args.BitIndex = 0;
@@ -125,15 +125,8 @@ namespace Xe.BinaryMapper
             }
             else
             {
-                return ReadObject(args.Reader, Activator.CreateInstance(type), (int)args.Reader.BaseStream.Position);
+                return ReadRawObject(args.Reader, Activator.CreateInstance(type), (int)args.Reader.BaseStream.Position);
             }
-        }
-
-        private static string ReadString(BinaryReader reader, int length)
-        {
-            var data = reader.ReadBytes(length);
-            var terminatorIndex = Array.FindIndex(data, x => x == 0);
-            return StringEncoding.GetString(data, 0, terminatorIndex < 0 ? length : terminatorIndex);
         }
     }
 }

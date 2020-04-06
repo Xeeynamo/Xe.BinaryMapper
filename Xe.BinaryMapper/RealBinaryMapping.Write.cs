@@ -1,23 +1,18 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
 namespace Xe.BinaryMapper
 {
-    public partial class BinaryMapping
+    internal partial class RealBinaryMapping
     {
-        public static T WriteObject<T>(Stream stream, T item, int baseOffset = 0)
+        public T WriteObject<T>(Stream stream, T item, int baseOffset)
             where T : class =>
-            WriteObject(new BinaryWriter(stream), item, baseOffset);
+            (T)WriteObject(new BinaryWriter(stream), item, baseOffset);
 
-        public static T WriteObject<T>(BinaryWriter writer, T item, int baseOffset = 0)
-            where T : class =>
-            (T)WriteObject(writer, (object)item, baseOffset);
-
-        public static object WriteObject(BinaryWriter writer, object item, int baseOffset = 0)
+        private object WriteObject(BinaryWriter writer, object item, int baseOffset)
         {
             var result = WriteObject(new MappingWriteArgs
             {
@@ -30,7 +25,7 @@ namespace Xe.BinaryMapper
             return result;
         }
 
-        private static object WriteObject(MappingWriteArgs args, object item, int baseOffset = 0)
+        private object WriteObject(MappingWriteArgs args, object item, int baseOffset)
         {
             var properties = item.GetType()
                 .GetProperties()
@@ -58,7 +53,7 @@ namespace Xe.BinaryMapper
             return item;
         }
 
-        private static void WriteProperty(MappingWriteArgs args, object value, Type type, MyProperty property)
+        private void WriteProperty(MappingWriteArgs args, object value, Type type, MyProperty property)
         {
             if (type != typeof(bool))
                 FlushBitField(args);
@@ -118,7 +113,7 @@ namespace Xe.BinaryMapper
             }
         }
 
-        private static void FlushBitField(MappingWriteArgs args)
+        internal static void FlushBitField(MappingWriteArgs args)
         {
             if (args.BitIndex <= 0) return;
 
@@ -127,7 +122,7 @@ namespace Xe.BinaryMapper
             args.BitData = 0;
         }
 
-        private static void WriteObject(MappingWriteArgs args, object value, Type listType, MyProperty property)
+        private void WriteObject(MappingWriteArgs args, object value, Type listType, MyProperty property)
         {
             var writer = args.Writer;
             var oldPosition = (int)writer.BaseStream.Position;
@@ -146,24 +141,6 @@ namespace Xe.BinaryMapper
                 {
                     writer.BaseStream.Position += missingBytes;
                 }
-            }
-        }
-
-        private static void Write(BinaryWriter writer, string str, int length)
-        {
-            var data = StringEncoding.GetBytes(str);
-            if (data.Length <= length)
-            {
-                writer.Write(data, 0, data.Length);
-                int remainsBytes = length - data.Length;
-                if (remainsBytes > 0)
-                {
-                    writer.Write(new byte[remainsBytes]);
-                }
-            }
-            else
-            {
-                writer.Write(data, 0, length);
             }
         }
     }

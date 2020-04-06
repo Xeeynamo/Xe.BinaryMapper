@@ -9,14 +9,14 @@ namespace Xe.BinaryMapper.Tests
         [Fact]
         public void ReadAndWriteTimeSpan()
         {
-            BinaryMapping.SetMapping<TimeSpan>(new BinaryMapping.Mapping
-            {
-                Writer = x => x.Writer.Write((int)((TimeSpan)x.Item).TotalSeconds),
-                Reader = x => new TimeSpan(0, 0, seconds: x.Reader.ReadInt32())
-            });
+            var binaryMapping = MappingConfiguration
+                .DefaultConfiguration()
+                .ForType<TimeSpan>(
+                    x => new TimeSpan(0, 0, seconds: x.Reader.ReadInt32()),
+                    x => x.Writer.Write((int)((TimeSpan)x.Item).TotalSeconds))
+                .Build();
 
-            AssertReadAndWrite(new TimeSpan(hours: 0, minutes: 0, seconds: 500), 4);
-            BinaryMapping.RemoveCustomMappings();
+            AssertReadAndWrite(binaryMapping, new TimeSpan(hours: 0, minutes: 0, seconds: 500), 4);
         }
     }
 }

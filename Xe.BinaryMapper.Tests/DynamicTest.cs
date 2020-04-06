@@ -46,12 +46,16 @@ namespace Xe.BinaryMapper.Tests
             };
 
             var memStream = new MemoryStream();
-            BinaryMapping.SetMemberLengthMapping<DynamicStringFixture>(nameof(DynamicStringFixture.Text), (o, m) => o.Length);
-            BinaryMapping.WriteObject(memStream, obj);
+
+            var mapper = MappingConfiguration.DefaultConfiguration()
+                .UseMemberForLength<DynamicStringFixture>(nameof(DynamicStringFixture.Text), (o, m) => o.Length)
+                .Build();
+
+            mapper.WriteObject(memStream, obj);
             Assert.Equal(length + 1, memStream.Position);
 
             memStream.Position = 0;
-            var actual = BinaryMapping.ReadObject<DynamicStringFixture>(memStream);
+            var actual = mapper.ReadObject<DynamicStringFixture>(memStream);
             Assert.Equal(length, actual.Length);
             Assert.Equal(expected, actual.Text);
             Assert.Equal(length + 1, memStream.Position);
@@ -83,14 +87,17 @@ namespace Xe.BinaryMapper.Tests
                 }
             };
 
+            var mapper = MappingConfiguration.DefaultConfiguration()
+                .UseMemberForLength<DynamicStringFixture>(nameof(DynamicStringFixture.Text), (o, m) => o.Length)
+                .UseMemberForLength<DynamicObjectFixture>(nameof(DynamicObjectFixture.Items), (o, m) => o.Count)
+                .Build();
+
             var memStream = new MemoryStream();
-            BinaryMapping.SetMemberLengthMapping<DynamicStringFixture>(nameof(DynamicStringFixture.Text), (o, m) => o.Length);
-            BinaryMapping.SetMemberLengthMapping<DynamicObjectFixture>(nameof(DynamicObjectFixture.Items), (o, m) => o.Count);
-            BinaryMapping.WriteObject(memStream, obj);
+            mapper.WriteObject(memStream, obj);
             Assert.Equal(14, memStream.Position);
 
             memStream.Position = 0;
-            var actual = BinaryMapping.ReadObject<DynamicObjectFixture>(memStream);
+            var actual = mapper.ReadObject<DynamicObjectFixture>(memStream);
             Assert.Equal(obj.Count, actual.Count);
             Assert.Equal(obj.Items.Count, actual.Items.Count);
             Assert.Equal(obj.Items[0].Length, actual.Items[0].Length);
@@ -127,14 +134,17 @@ namespace Xe.BinaryMapper.Tests
                 }
             };
 
+            var mapper = MappingConfiguration.DefaultConfiguration()
+                .UseMemberForLength<DynamicStringFixture>(nameof(DynamicStringFixture.Text), (o, m) => o.Length)
+                .UseMemberForLength<DynamicObjectWithAutoCountFixture>(nameof(DynamicObjectFixture.Items), (o, m) => o.Count)
+                .Build();
+
             var memStream = new MemoryStream();
-            BinaryMapping.SetMemberLengthMapping<DynamicStringFixture>(nameof(DynamicStringFixture.Text), (o, m) => o.Length);
-            BinaryMapping.SetMemberLengthMapping<DynamicObjectWithAutoCountFixture>(nameof(DynamicObjectFixture.Items), (o, m) => o.Count);
-            BinaryMapping.WriteObject(memStream, obj);
+            mapper.WriteObject(memStream, obj);
             Assert.Equal(14, memStream.Position);
 
             memStream.Position = 0;
-            var actual = BinaryMapping.ReadObject<DynamicObjectWithAutoCountFixture>(memStream);
+            var actual = mapper.ReadObject<DynamicObjectWithAutoCountFixture>(memStream);
             Assert.Equal(obj.Count, actual.Count);
             Assert.Equal(obj.Items.Count, actual.Items.Count);
             Assert.Equal(obj.Items[0].Length, actual.Items[0].Length);

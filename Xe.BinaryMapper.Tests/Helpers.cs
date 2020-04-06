@@ -29,7 +29,10 @@ namespace Xe.BinaryMapper.Tests
             AssertReadAndWrite(value, Marshal.SizeOf<T>());
         }
 
-        public static void AssertReadAndWrite<T>(T value, int expectedLength, Action<ValuePair<T>> assertion = null)
+        public static void AssertReadAndWrite<T>(T value, int expectedLength, Action<ValuePair<T>> assertion = null) =>
+            AssertReadAndWrite<T>(BinaryMapping.Default, value, expectedLength, assertion);
+
+        public static void AssertReadAndWrite<T>(IBinaryMapping mapper, T value, int expectedLength, Action<ValuePair<T>> assertion = null)
         {
             var expected = new Generic<T>
             {
@@ -38,14 +41,12 @@ namespace Xe.BinaryMapper.Tests
             var actual = new Generic<T>();
 
             var memory = new MemoryStream();
-            var reader = new BinaryReader(memory);
-            var writer = new BinaryWriter(memory);
-            BinaryMapping.WriteObject(writer, expected);
+            mapper.WriteObject(memory, expected);
 
             Assert.Equal(expectedLength, memory.Length);
 
             memory.Position = 0;
-            BinaryMapping.ReadObject(reader, actual);
+            mapper.ReadObject(memory, actual);
 
             Assert.Equal(expectedLength, memory.Position);
 
@@ -88,14 +89,12 @@ namespace Xe.BinaryMapper.Tests
             var actual = (IGeneric<T>)Activator.CreateInstance(actualType);
 
             var memory = new MemoryStream();
-            var reader = new BinaryReader(memory);
-            var writer = new BinaryWriter(memory);
-            BinaryMapping.WriteObject(writer, value);
+            BinaryMapping.WriteObject(memory, value);
 
             Assert.Equal(expectedLength, memory.Length);
 
             memory.Position = 0;
-            BinaryMapping.ReadObject(reader, actual);
+            BinaryMapping.ReadObject(memory, actual);
 
             Assert.Equal(expectedLength, memory.Position);
 
