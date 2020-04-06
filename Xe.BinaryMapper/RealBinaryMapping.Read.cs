@@ -110,15 +110,31 @@ namespace Xe.BinaryMapper
                     throw new InvalidDataException($"Unable to get the underlying type of {type.Name}.");
 
                 var array = Array.CreateInstance(arrayType, args.Count);
-                for (var i = 0; i < args.Count; i++)
+                if (arrayType.IsEnum)
                 {
-                    var oldPosition = (int)args.Reader.BaseStream.Position;
+                    for (var i = 0; i < args.Count; i++)
+                    {
+                        var oldPosition = (int)args.Reader.BaseStream.Position;
 
-                    var item = ReadProperty(args, arrayType, property);
-                    array.SetValue(item, i);
+                        var item = ReadProperty(args, arrayType, property);
+                        array.SetValue(Enum.ToObject(arrayType, item), i);
 
-                    var newPosition = args.Reader.BaseStream.Position;
-                    args.Reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
+                        var newPosition = args.Reader.BaseStream.Position;
+                        args.Reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i < args.Count; i++)
+                    {
+                        var oldPosition = (int)args.Reader.BaseStream.Position;
+
+                        var item = ReadProperty(args, arrayType, property);
+                        array.SetValue(item, i);
+
+                        var newPosition = args.Reader.BaseStream.Position;
+                        args.Reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
+                    }
                 }
 
                 return array;
