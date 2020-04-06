@@ -36,11 +36,10 @@ namespace Xe.BinaryMapper.Tests
             foo.List[0].Data[0xC] = 231;
 
             var memStream = new MemoryStream();
-            var writer = new BinaryWriter(memStream);
-            BinaryMapping.WriteObject(writer, foo);
+            BinaryMapping.WriteObject(memStream, foo);
             memStream.Position = 0;
 
-            var foo2 = BinaryMapping.ReadObject(new BinaryReader(memStream), new Foo()) as Foo;
+            var foo2 = BinaryMapping.ReadObject(memStream, new Foo()) as Foo;
             Assert.Equal(foo.List[0].Data[0xC], foo2.List[0].Data[0xC]);
         }
     }

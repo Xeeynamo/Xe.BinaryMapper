@@ -50,7 +50,7 @@ namespace Xe.BinaryMapper.Tests
         {
             var rawData = new byte[] { 0xAD, 0x02 };
             var memStream = new MemoryStream(rawData);
-            var actual = BinaryMapping.ReadObject(new BinaryReader(memStream), new SimpleBitfieldFixture()) as SimpleBitfieldFixture;
+            var actual = BinaryMapping.ReadObject(memStream, new SimpleBitfieldFixture()) as SimpleBitfieldFixture;
 
             Assert.NotNull(actual);
             Assert.Equal(2, memStream.Position);
@@ -66,7 +66,7 @@ namespace Xe.BinaryMapper.Tests
             Assert.True(actual.Bit9);
 
             memStream = new MemoryStream();
-            BinaryMapping.WriteObject(new BinaryWriter(memStream), actual);
+            BinaryMapping.WriteObject(memStream, actual);
 
             Assert.Equal(2, memStream.Position);
             memStream.Position = 0;
@@ -79,7 +79,7 @@ namespace Xe.BinaryMapper.Tests
         {
             var rawData = new byte[] { 0x01, 0xFF, 0xFF, 0x02 };
             var memStream = new MemoryStream(rawData);
-            var actual = BinaryMapping.ReadObject(new BinaryReader(memStream), new DiscontinuedBitfieldFixture()) as DiscontinuedBitfieldFixture;
+            var actual = BinaryMapping.ReadObject(memStream, new DiscontinuedBitfieldFixture()) as DiscontinuedBitfieldFixture;
 
             Assert.NotNull(actual);
             Assert.Equal(4, memStream.Position);
@@ -90,7 +90,7 @@ namespace Xe.BinaryMapper.Tests
             Assert.True(actual.Bit21);
 
             memStream = new MemoryStream();
-            BinaryMapping.WriteObject(new BinaryWriter(memStream), actual);
+            BinaryMapping.WriteObject(memStream, actual);
 
             Assert.Equal(4, memStream.Position);
             memStream.Position = 0;
@@ -105,7 +105,7 @@ namespace Xe.BinaryMapper.Tests
         {
             var rawData = new byte[] { 2, 5 };
             var memStream = new MemoryStream(rawData);
-            var actual = BinaryMapping.ReadObject(new BinaryReader(memStream), new OffsetBitfieldFixture()) as OffsetBitfieldFixture;
+            var actual = BinaryMapping.ReadObject(memStream, new OffsetBitfieldFixture()) as OffsetBitfieldFixture;
 
             Assert.NotNull(actual);
             Assert.True(actual.Bit10);
@@ -115,7 +115,7 @@ namespace Xe.BinaryMapper.Tests
             Assert.True(actual.Bit01);
 
             memStream = new MemoryStream();
-            BinaryMapping.WriteObject(new BinaryWriter(memStream), actual);
+            BinaryMapping.WriteObject(memStream, actual);
 
             Assert.Equal(2, memStream.Length);
             memStream.Position = 0;
@@ -128,7 +128,7 @@ namespace Xe.BinaryMapper.Tests
         {
             var rawData = new byte[] { 0, 2, 0x2c };
             var memStream = new MemoryStream(rawData);
-            var actual = BinaryMapping.ReadObject(new BinaryReader(memStream), new IndexedBitfieldFixture()) as IndexedBitfieldFixture;
+            var actual = BinaryMapping.ReadObject(memStream, new IndexedBitfieldFixture()) as IndexedBitfieldFixture;
 
             Assert.NotNull(actual);
             Assert.True(actual.Bit11);
@@ -137,7 +137,7 @@ namespace Xe.BinaryMapper.Tests
             Assert.True(actual.Bit25);
 
             memStream = new MemoryStream();
-            BinaryMapping.WriteObject(new BinaryWriter(memStream), actual);
+            BinaryMapping.WriteObject(memStream, actual);
 
             Assert.Equal(3, memStream.Length);
             memStream.Position = 0;
