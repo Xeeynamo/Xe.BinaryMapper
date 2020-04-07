@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -28,7 +28,12 @@ namespace Xe.BinaryMapper
                     if (x.BitIndex >= 8)
                         x.BitIndex = 0;
                     if (x.BitIndex == 0)
-                        x.BitData = x.Reader.ReadByte();
+                    {
+                        var data = x.Reader.ReadByte();
+                        if (data == -1)
+                            throw new EndOfStreamException();
+                        x.BitData = (byte)data;
+                    }
                     if (x.DataAttribute.BitIndex >= 0)
                         x.BitIndex = x.DataAttribute.BitIndex;
 
