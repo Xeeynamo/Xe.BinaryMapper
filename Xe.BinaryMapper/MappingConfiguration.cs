@@ -14,9 +14,9 @@ namespace Xe.BinaryMapper
         public static MappingConfiguration DefaultConfiguration() =>
             DefaultConfiguration(Encoding.UTF8);
 
-        public static MappingConfiguration DefaultConfiguration(Encoding encoding) => new MappingConfiguration
+        public static MappingConfiguration DefaultConfiguration(Encoding encoding, bool isBigEndian = false) => new MappingConfiguration
         {
-            Mappings = BinaryMapper.Mappings.DefaultMapping(encoding),
+            Mappings = isBigEndian ? BinaryMapper.Mappings.BigEndianMapping(encoding) : BinaryMapper.Mappings.DefaultMapping(encoding),
             MemberMappings = new Dictionary<Type, Dictionary<string, Func<object, int>>>()
         };
     }

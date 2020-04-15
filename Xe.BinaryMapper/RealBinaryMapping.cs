@@ -12,8 +12,6 @@ namespace Xe.BinaryMapper
 
         private readonly Dictionary<Type, MappingDefinition> mappings;
 
-        public Encoding StringEncoding { get; }
-
         public RealBinaryMapping(MappingConfiguration configuration)
         {
             if (configuration.Mappings == null)
