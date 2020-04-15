@@ -12,7 +12,7 @@ namespace Xe.BinaryMapper
 
         private readonly Dictionary<Type, MappingDefinition> mappings;
 
-        public Encoding StringEncoding { get; }
+        public bool IsLittleEndian { get; }
 
         public RealBinaryMapping(MappingConfiguration configuration)
         {
@@ -25,6 +25,7 @@ namespace Xe.BinaryMapper
 
             mappings = configuration.Mappings;
             memberMappings = configuration.MemberMappings;
+            IsLittleEndian = true;
         }
 
         private MyProperty GetPropertySettings(Type classType, PropertyInfo propertyInfo)

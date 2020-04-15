@@ -89,7 +89,7 @@ namespace Xe.BinaryMapper
 
     public class MappingReadArgs
     {
-        public BinaryReader Reader { get; set; }
+        public BufferedReader Reader { get; set; }
 
         public DataAttribute DataAttribute { get; set; }
 

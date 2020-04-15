@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Xe.BinaryMapper
 {
@@ -24,9 +23,9 @@ namespace Xe.BinaryMapper
 
         public T ReadObject<T>(Stream stream, T item, int baseOffset)
             where T : class =>
-            (T)ReadRawObject(new BinaryReader(stream), item, baseOffset);
+            (T)ReadRawObject(new BufferedReader(stream, IsLittleEndian), item, baseOffset);
 
-        private object ReadRawObject(BinaryReader reader, object item, int baseOffset)
+        private object ReadRawObject(BufferedReader reader, object item, int baseOffset)
         {
             var properties = item.GetType()
                 .GetProperties()
@@ -44,10 +43,10 @@ namespace Xe.BinaryMapper
                 if (property.DataInfo.Offset.HasValue)
                 {
                     var newPosition = baseOffset + property.DataInfo.Offset.Value;
-                    if (reader.BaseStream.Position != newPosition + 1)
+                    if (reader.Position != newPosition + 1)
                         args.BitIndex = 0;
 
-                    reader.BaseStream.Position = newPosition;
+                    reader.Position = newPosition;
                 }
 
                 args.Count = property.GetLengthFunc?.Invoke(item) ?? property.DataInfo.Count;
@@ -89,13 +88,13 @@ namespace Xe.BinaryMapper
 
                 for (int i = 0; i < args.Count; i++)
                 {
-                    var oldPosition = (int)args.Reader.BaseStream.Position;
+                    var oldPosition = (int)args.Reader.Position;
 
                     var item = ReadProperty(args, listType, property);
                     addMethod.Invoke(list, new[] { item });
 
-                    var newPosition = args.Reader.BaseStream.Position;
-                    args.Reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
+                    var newPosition = args.Reader.Position;
+                    args.Reader.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
                 }
 
                 return list;
@@ -114,26 +113,26 @@ namespace Xe.BinaryMapper
                 {
                     for (var i = 0; i < args.Count; i++)
                     {
-                        var oldPosition = (int)args.Reader.BaseStream.Position;
+                        var oldPosition = (int)args.Reader.Position;
 
                         var item = ReadProperty(args, arrayType, property);
                         array.SetValue(Enum.ToObject(arrayType, item), i);
 
-                        var newPosition = args.Reader.BaseStream.Position;
-                        args.Reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
+                        var newPosition = args.Reader.Position;
+                        args.Reader.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
                     }
                 }
                 else
                 {
                     for (var i = 0; i < args.Count; i++)
                     {
-                        var oldPosition = (int)args.Reader.BaseStream.Position;
+                        var oldPosition = (int)args.Reader.Position;
 
                         var item = ReadProperty(args, arrayType, property);
                         array.SetValue(item, i);
 
-                        var newPosition = args.Reader.BaseStream.Position;
-                        args.Reader.BaseStream.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
+                        var newPosition = args.Reader.Position;
+                        args.Reader.Position += Math.Max(0, property.DataInfo.Stride - (newPosition - oldPosition));
                     }
                 }
 
@@ -141,7 +140,7 @@ namespace Xe.BinaryMapper
             }
             else
             {
-                return ReadRawObject(args.Reader, Activator.CreateInstance(type), (int)args.Reader.BaseStream.Position);
+                return ReadRawObject(args.Reader, Activator.CreateInstance(type), (int)args.Reader.Position);
             }
         }
     }

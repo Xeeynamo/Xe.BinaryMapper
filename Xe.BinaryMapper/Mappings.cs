@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -43,12 +43,12 @@ namespace Xe.BinaryMapper
             [typeof(byte)] = new MappingDefinition
             {
                 Writer = x => x.Writer.Write((byte)x.Item),
-                Reader = x => x.Reader.ReadByte()
+                Reader = x => x.Reader.ReadUInt8()
             },
             [typeof(sbyte)] = new MappingDefinition
             {
                 Writer = x => x.Writer.Write((sbyte)x.Item),
-                Reader = x => x.Reader.ReadSByte()
+                Reader = x => x.Reader.ReadInt8()
             },
             [typeof(short)] = new MappingDefinition
             {
@@ -121,7 +121,7 @@ namespace Xe.BinaryMapper
             },
         };
 
-        private static string ReadString(BinaryReader reader, Encoding encoding, int length)
+        private static string ReadString(BufferedReader reader, Encoding encoding, int length)
         {
             var data = reader.ReadBytes(length);
             var terminatorIndex = Array.FindIndex(data, x => x == 0);
