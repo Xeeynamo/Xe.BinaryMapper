@@ -13,6 +13,8 @@ De/serialize a stream into a class.
     * [Deserialization](#deserialization)
     * [Properties and Data attribute](#properties-and-data-attribute)
     * [Type bool and bit fields](#type-bool-and-bit-fields)
+    * [Mocking for unit tests](#mocking-for-unit-tests)
+    * [Big Endian and different text encoding](#big-endian-and-different-text-encoding)
     * [Customize type mapping](#customize-type-mapping)
     * [Dynamic length of type List< T >](#dynamic-length-of-type-list)
 
@@ -65,9 +67,9 @@ There are no known limitations on using the library using the Mono runtime (eg. 
 
 The entire serialization happens in `BinaryMapping.WriteObject`, which accepts the following parameters:
 
-* `Stream` / `BinaryWriter`: A writable stream where the content will be written to.
+* `Stream`: A writable stream where the content will be written to.
 
-* `T item` / `object item`: The object that needs to be serialized.
+* `T item`: The object that needs to be serialized.
 
 * `int baseOffset`: The absolute position in the stream where the write will start. (optional)
 
@@ -77,9 +79,9 @@ The returned value is the same item passed as parameter.
 
 The entire de-serialization happens in `BinaryMapping.ReadObject`, which accepts the following parameters:
 
-* `Stream` / `BinaryReader`: A readable stream where the content will be read from.
+* `Stream`: A readable stream where the content will be read from.
 
-* `T item` / `object item`: An existing object where all the serializable properties will be populated by the read content. If no item is specified, an instance of `T` will be created as long as the constructor's class is parameterless. (optional)
+* `T item`: An existing object where all the serializable properties will be populated by the read content. If no item is specified, an instance of `T` will be created as long as the constructor's class is parameterless. (optional)
 
 * `int baseOffset`: The absolute position in the stream where the read will start. (optional)
 
@@ -126,6 +128,20 @@ The code snippet above will read a total of 3 bytes. The first two bits will be 
 
 The code snippet above will read again only 2 bytes. After reading the 2nd byte, it will return to the position 0 and to the 3rd bit (0 based index), continuing the read from there.
 
+### Mocking for unit tests
+
+The `IBinaryMapping` is an extremely light-weight interface with just two methods. If you do not want to use BinaryMapper in your unit tests, or just mock its implementation, you just need to care about mocking its two methods.
+
+### Big Endian and different text encoding
+
+By default, BinaryMapper de/serialize strings using `Encoding.UTF8` and little endian. You can customize those behaviours by creating a different instance of BinaryMapper:
+
+```csharp
+var mapper = MappingConfiguration
+    .DefaultConfiguration(Encoding.UTF16, /*isBigEndian*/true)
+    .Build();
+```
+
 ### Customize type mapping
 
 To customize how the de/serialization works for a specific type, a `Mapping` object must be passed to `BinaryMapping.SetMapping`.
@@ -133,11 +149,13 @@ To customize how the de/serialization works for a specific type, a `Mapping` obj
 A `Mapping` object is defined by two actions: `Writer` and `Reader`. An example on how to customize a mapping can be found here:
 
 ```csharp
-BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
+var config = MappingConfiguration.DefaultConfiguration();
+config.Mappings.Add(typeof(bool), new MappingDefinition
 {
     Writer = x => x.Writer.Write((byte)((bool)x.Item ? 1 : 0)),
     Reader = x => x.Reader.ReadByte() != 0
 });
+var mapper = config.Build();
 ```
 
 ### Dynamic length of type `List<>`
@@ -145,6 +163,7 @@ BinaryMapping.SetMapping<bool>(new BinaryMapping.Mapping
 When you specify `[Data(Count = 5)]` on a `List<T>`, that property will be de/serialized with a fixed length of 5, no matter what. Often you do not want to be stuck on that, since you might want to be able to specify a dynamic amount of elements. This can be achieved with a method called `BinaryMapping.SetMemberLengthMapping<T>`.
 
 Let's take the following example:
+
 ```csharp
 private class ListExample
 {
@@ -156,7 +175,9 @@ private class ListExample
 You should be able to insert any amount of `Items` as possible, but of course you should define before a property that will read/write the amount of elements in it. TO achieve that, you need to link `Items` with `Count`, using the following statement:
 
 ```csharp
-BinaryMapping.SetMemberLengthMapping<ListExample>(nameof(ListExample.Items), (o, m) => o.Count);
+var mapper = MappingConfiguration.DefaultConfiguration()
+    .UseMemberForLength<DynamicStringFixture>(nameof(ListExample.Items), (o, m) => o.Count)
+    .Build();
 ```
 
 The code above says that, for the class `ListExample`, you want that the amount of elements inside `ListExample.Items` has to be taken from `Count`. Notice that in `(o, m)`, the `o` is the object instance of `ListExample` that will be processed right before `Items`, while `m` is a string that will be equal to the property name `Items`, useful if some branch condition is needed based on the property name.
@@ -177,17 +198,16 @@ private class ListExample
 
 In that way you will couple `Count` and `Items` together, automating the step to update `Count` manually and reducing the amount of errors on your code.
 
-
 ## Example
 
- ```csharp
- class Sample
- {
-     [Data] public short Foo { get; set; }
-     [Data(offset: 4, count: 3, stride: 2)] public List<byte> Bar { get; set; }
- }
+```csharp
+class Sample
+{
+    [Data] public short Foo { get; set; }
+    [Data(offset: 4, count: 3, stride: 2)] public List<byte> Bar { get; set; }
+}
 
- ...
+...
 
 var obj = new Sample
 {
@@ -196,9 +216,11 @@ var obj = new Sample
 };
 BinaryMapping.WriteObject(writer, obj);
 ```
+
 will be serialized into `7B 00 00 00 16 00 2C 00 00 00`.
 
 ### How the data is de/serialized under the hood
+
 The binary data serialized few lines ago can be break down in the following flow logic:
 
 `[Data] public short Foo { get; set; }`
@@ -240,23 +262,21 @@ Absolutely! Many primitive values are supported and can be customized (like how 
 
 ## Future plans
 
-* Improve performance caching types
-* BinaryMapping object instances, without relying to a global instance
-* Custom object de/serialization
+* Improve performance by caching types de/serialization
 * Support for existing classes without using DataAttribute
-* Big-endian support
+* Use of decorator for length mappping instead of `UseMemberForLength`
+* Use `PreProcess` and `PostProcess` as suggested in #2
+* ~~BinaryMapping object instances, without relying to a global instance~~ DONE
+* ~~Custom object de/serialization~~ DONE
+* ~~Big-endian support~~ DONE
 
 ## Showcase
 
-### Kingdom Hearts Save Editor
-
-https://github.com/Xeeynamo/KH3SaveEditor
+### [Kingdom Hearts Save Editor](https://github.com/Xeeynamo/KH3SaveEditor)
 
 Written by the author of BinaryMapper. This is a perfect example on a real scenario of how BinaryMapper can be used.
 
 
-### OpenKH
+### [OpenKH](https://github.com/Xeeynamo/OpenKh)
 
-https://github.com/Xeeynamo/OpenKh
-
-Another example on how binary files from a videogame can be mapped into C# objects
+Another example on how binary files from a videogame can be mapped into C# objects.
