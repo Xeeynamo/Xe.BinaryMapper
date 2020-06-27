@@ -42,5 +42,48 @@ namespace Xe.BinaryMapper.Tests
             var foo2 = BinaryMapping.ReadObject(memStream, new Foo()) as Foo;
             Assert.Equal(foo.List[0].Data[0xC], foo2.List[0].Data[0xC]);
         }
+
+#region issue #3
+        public class Issue3_SimpleStructure
+        {
+            [Data] public byte Value { get; set; }
+        }
+
+        public class Issue3_SampleClass
+        {
+            static Issue3_SampleClass()
+            {
+            }
+
+            [Data]
+            public int Length
+            {
+                get => Structures.TryGetCount();
+                set => Structures = Structures.CreateOrResize(value);
+            }
+            [Data] public List<Issue3_SimpleStructure> Structures { get; set; }
+
+            [Data]
+            public int Length2
+            {
+                get => Structures2.TryGetCount();
+                set => Structures2 = Structures2.CreateOrResize(value);
+            }
+            [Data] public List<Issue3_SimpleStructure> Structures2 { get; set; }
+        }
+
+        [Fact]
+        public void ShouldAddMoreThanOneMemberLengthForClass()
+        {
+            var mapping = MappingConfiguration
+                .DefaultConfiguration()
+                .UseMemberForLength<Issue3_SampleClass>(nameof(Issue3_SampleClass.Structures), (o, m) => o.Length)
+                .UseMemberForLength<Issue3_SampleClass>(nameof(Issue3_SampleClass.Structures2), (o, m) => o.Length2)
+                .Build();
+
+            var stream = new MemoryStream(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+            var content = mapping.ReadObject<Issue3_SampleClass>(stream);
+        }
+#endregion
     }
 }

@@ -51,13 +51,14 @@ namespace Xe.BinaryMapper
             where T : class
         {
             var classType = typeof(T);
-            if (!configuration.MemberMappings.TryGetValue(classType, out var classMapping))
+            var classMappings = new Dictionary<string, Func<object, int>>();
+            if (!configuration.MemberMappings.TryGetValue(classType, out classMappings))
             {
-                classMapping = new Dictionary<string, Func<object, int>>();
-                configuration.MemberMappings.Add(classType, classMapping);
-                classMapping[memberName] = o => getLengthFunc((T)o, memberName);
+                classMappings = new Dictionary<string, Func<object, int>>();
+                configuration.MemberMappings.Add(classType, classMappings);
             }
 
+            classMappings[memberName] = o => getLengthFunc((T)o, memberName);
             return configuration;
         }
 
