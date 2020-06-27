@@ -158,8 +158,8 @@ namespace Xe.BinaryMapper
             {
                 Writer = x =>
                 {
-                    x.Writer.Write((byte)(((short)x.Item >> 0) & 0xff));
                     x.Writer.Write((byte)(((short)x.Item >> 8) & 0xff));
+                    x.Writer.Write((byte)(((short)x.Item >> 0) & 0xff));
                 },
                 Reader = x =>
                 {
@@ -172,8 +172,8 @@ namespace Xe.BinaryMapper
             {
                 Writer = x =>
                 {
-                    x.Writer.Write((byte)(((ushort)x.Item >> 0) & 0xff));
                     x.Writer.Write((byte)(((ushort)x.Item >> 8) & 0xff));
+                    x.Writer.Write((byte)(((ushort)x.Item >> 0) & 0xff));
                 },
                 Reader = x =>
                 {
@@ -186,10 +186,10 @@ namespace Xe.BinaryMapper
             {
                 Writer = x =>
                 {
-                    x.Writer.Write((byte)(((int)x.Item >> 0) & 0xff));
-                    x.Writer.Write((byte)(((int)x.Item >> 8) & 0xff));
-                    x.Writer.Write((byte)(((int)x.Item >> 16) & 0xff));
                     x.Writer.Write((byte)(((int)x.Item >> 24) & 0xff));
+                    x.Writer.Write((byte)(((int)x.Item >> 16) & 0xff));
+                    x.Writer.Write((byte)(((int)x.Item >> 8) & 0xff));
+                    x.Writer.Write((byte)(((int)x.Item >> 0 & 0xff)));
                 },
                 Reader = x =>
                 {
@@ -202,10 +202,10 @@ namespace Xe.BinaryMapper
             {
                 Writer = x =>
                 {
-                    x.Writer.Write((byte)(((uint)x.Item >> 0) & 0xff));
-                    x.Writer.Write((byte)(((uint)x.Item >> 8) & 0xff));
-                    x.Writer.Write((byte)(((uint)x.Item >> 16) & 0xff));
                     x.Writer.Write((byte)(((uint)x.Item >> 24) & 0xff));
+                    x.Writer.Write((byte)(((uint)x.Item >> 16) & 0xff));
+                    x.Writer.Write((byte)(((uint)x.Item >> 8) & 0xff));
+                    x.Writer.Write((byte)(((uint)x.Item >> 0) & 0xff));
                 },
                 Reader = x =>
                 {
@@ -218,14 +218,15 @@ namespace Xe.BinaryMapper
             {
                 Writer = x =>
                 {
-                    x.Writer.Write((byte)(((long)x.Item >> 0) & 0xff));
-                    x.Writer.Write((byte)(((long)x.Item >> 8) & 0xff));
-                    x.Writer.Write((byte)(((long)x.Item >> 16) & 0xff));
-                    x.Writer.Write((byte)(((long)x.Item >> 24) & 0xff));
-                    x.Writer.Write((byte)(((long)x.Item >> 32) & 0xff));
-                    x.Writer.Write((byte)(((long)x.Item >> 40) & 0xff));
-                    x.Writer.Write((byte)(((long)x.Item >> 48) & 0xff));
                     x.Writer.Write((byte)(((long)x.Item >> 56) & 0xff));
+                    x.Writer.Write((byte)(((long)x.Item >> 48) & 0xff));
+                    x.Writer.Write((byte)(((long)x.Item >> 40) & 0xff));
+                    x.Writer.Write((byte)(((long)x.Item >> 32) & 0xff));
+                    x.Writer.Write((byte)(((long)x.Item >> 24) & 0xff));
+                    x.Writer.Write((byte)(((long)x.Item >> 16) & 0xff));
+                    x.Writer.Write((byte)(((long)x.Item >> 8) & 0xff));
+                    x.Writer.Write((byte)(((long)x.Item >> 0) & 0xff));
+
                 },
                 Reader = x =>
                 {
@@ -238,14 +239,14 @@ namespace Xe.BinaryMapper
             {
                 Writer = x =>
                 {
-                    x.Writer.Write((byte)(((ulong)x.Item >> 0) & 0xff));
-                    x.Writer.Write((byte)(((ulong)x.Item >> 8) & 0xff));
-                    x.Writer.Write((byte)(((ulong)x.Item >> 16) & 0xff));
-                    x.Writer.Write((byte)(((ulong)x.Item >> 24) & 0xff));
-                    x.Writer.Write((byte)(((ulong)x.Item >> 32) & 0xff));
-                    x.Writer.Write((byte)(((ulong)x.Item >> 40) & 0xff));
-                    x.Writer.Write((byte)(((ulong)x.Item >> 48) & 0xff));
                     x.Writer.Write((byte)(((ulong)x.Item >> 56) & 0xff));
+                    x.Writer.Write((byte)(((ulong)x.Item >> 48) & 0xff));
+                    x.Writer.Write((byte)(((ulong)x.Item >> 40) & 0xff));
+                    x.Writer.Write((byte)(((ulong)x.Item >> 32) & 0xff));
+                    x.Writer.Write((byte)(((ulong)x.Item >> 24) & 0xff));
+                    x.Writer.Write((byte)(((ulong)x.Item >> 16) & 0xff));
+                    x.Writer.Write((byte)(((ulong)x.Item >> 8) & 0xff));
+                    x.Writer.Write((byte)(((ulong)x.Item >> 0) & 0xff));
                 },
                 Reader = x =>
                 {
