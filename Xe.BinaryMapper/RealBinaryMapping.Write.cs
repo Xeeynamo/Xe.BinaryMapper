@@ -27,6 +27,18 @@ namespace Xe.BinaryMapper
 
         private object WriteObject(MappingWriteArgs args, object item, int baseOffset)
         {
+            if (mappings.TryGetValue(item.GetType(), out var mapping))
+            {
+                mapping.Writer(new MappingWriteArgs
+                {
+                    Writer = args.Writer,
+                    Item = item,
+                    DataAttribute = new DataAttribute(),
+                });
+
+                return item;
+            }
+
             var properties = item.GetType()
                 .GetProperties()
                 .Select(x => GetPropertySettings(item.GetType(), x))

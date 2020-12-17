@@ -24,6 +24,15 @@ namespace Xe.BinaryMapper
 
         private object ReadRawObject(BinaryReader reader, object item, int baseOffset)
         {
+            if (mappings.TryGetValue(item.GetType(), out var mapping))
+            {
+                return mapping.Reader(new MappingReadArgs
+                {
+                    Reader = reader,
+                    DataAttribute = new DataAttribute()
+                });
+            }
+
             var properties = item.GetType()
                 .GetProperties()
                 .Select(x => GetPropertySettings(item.GetType(), x))
