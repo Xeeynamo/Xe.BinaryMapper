@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Xunit;
 
@@ -20,7 +20,7 @@ namespace Xe.BinaryMapper.Tests
             var obj = new Sample
             {
                 Foo = 123,
-                Bar = new List<byte>(){ 22, 44 }
+                Bar = new List<byte>() { 22, 44 }
             };
             BinaryMapping.WriteObject(memory, obj);
 

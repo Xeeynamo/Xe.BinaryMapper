@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using static Xe.BinaryMapper.Tests.Helpers;
 
 namespace Xe.BinaryMapper.Tests

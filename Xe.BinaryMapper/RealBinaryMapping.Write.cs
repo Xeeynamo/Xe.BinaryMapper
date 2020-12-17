@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
@@ -115,7 +115,8 @@ namespace Xe.BinaryMapper
 
         internal static void FlushBitField(MappingWriteArgs args)
         {
-            if (args.BitIndex <= 0) return;
+            if (args.BitIndex <= 0)
+                return;
 
             args.Writer.Write(args.BitData);
             args.BitIndex = 0;

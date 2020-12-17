@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Xunit;
 
@@ -43,7 +43,7 @@ namespace Xe.BinaryMapper.Tests
             Assert.Equal(foo.List[0].Data[0xC], foo2.List[0].Data[0xC]);
         }
 
-#region issue #3
+        #region issue #3
         public class Issue3_SimpleStructure
         {
             [Data] public byte Value { get; set; }
@@ -84,6 +84,6 @@ namespace Xe.BinaryMapper.Tests
             var stream = new MemoryStream(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
             var content = mapping.ReadObject<Issue3_SampleClass>(stream);
         }
-#endregion
+        #endregion
     }
 }
